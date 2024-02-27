@@ -9,3 +9,12 @@ March 15, 2024
 
 ### Description
 Making a heat-sensing nerf turret.
+
+
+### Geometric Turret Parameters
+| Motor Parameter | Value | Unit | 
+|:---------------:|:-----:|:----:|
+| Termainal Resistance | 53.2 | $$\Omega$$ |
+
+
+Table 1. Characteristics of the motor used in our project.
