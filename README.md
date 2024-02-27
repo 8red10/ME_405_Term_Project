@@ -27,3 +27,5 @@ Table 1. Characteristics of the motor used in our project.
 | Total Mass | | $kg$ | 
 
 Table 2. Related mass values of the turret.
+
+
