@@ -14,7 +14,7 @@ Making a heat-sensing nerf turret.
 ### Geometric Turret Parameters
 | Motor Parameter | Value | Unit | 
 |:---------------:|:-----:|:----:|
-| Terminal Resistance | 53.2 | $$\Omega$$ |
-| Terminal Inductance | | $$H$$ | 
+| Terminal Resistance | 53.2 | $\Omega$ |
+| Terminal Inductance | | $H$ | 
 
 Table 1. Characteristics of the motor used in our project.
