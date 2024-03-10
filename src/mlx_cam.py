@@ -309,14 +309,14 @@ def test_MLX_cam():
             # could also be written to a file. Spreadsheets, Matlab(tm), or
             # CPython can read CSV and make a decent false-color heat plot.
             show_image = False
-            show_csv = True
+            show_csv = False
             if show_image:
                 camera.ascii_image(image)
             elif show_csv:
                 i = 0
                 for line in camera.get_csv(image, limits=(0, 99)):
-                    l = len(line)
-                    print(f'num row = {i}, num cols = {l}')
+                    # l = len(line)
+                    # print(f'num row = {i}, num cols = {l}')
                     print(line)
                     i += 1
             else:
