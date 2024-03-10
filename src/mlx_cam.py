@@ -19,6 +19,7 @@
 @author mwerezak Original files, Summer 2022
 @author JR Ridgely Added simplified wrapper class @c MLX_Cam, January 2023
 @author Jack Krammer and Jason Chang
+@date   12-Mar-2024
 @copyright (c) 2022-2024 by the authors and released under the GNU Public
     License, version 3.        
 '''
@@ -196,20 +197,6 @@ class MLX_Cam:
         return image
 
 
-    ## @brief   Get an image from an MLX90640 camera in a non-blocking way.
-    #  @details This function is to be called repeatedly; it will return @c None
-    #           until a complete image has been retrieved (this takes around a
-    #           quarter to half second) and will then return the image.
-    #
-    #      @b Example: This code would be inside a task function which yields 
-    #      repeatedly as long as there isn't a complete image available.
-    #      @code
-    #      image = None
-    #      while not image:
-    #          image = camera.get_image_nonblocking()
-    #          yield(state)
-    #      @endcode
-    #
     def get_image_nonblocking(self):
         '''!
         @brief      Get an image from an MLX90640 camera in a non-blocking way.
