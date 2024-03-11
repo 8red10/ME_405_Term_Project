@@ -77,29 +77,18 @@ def init_objects():
     '''!
     Initializes the pins and drivers required for the turret. Returns these
     objects in a tuple. Initializes the pin to read the start button on pin
-    PB6. Initializes the builtin LED to be an output. Initializes the motor 
-    to rotate the turret on pins PC1, PA0, PA1, timer 5. Initializes the 
-    encoder reader on pins PC6, PC7, timer 8. Initializes the proportional 
-    controller with this motor driver and this encoder reader. Initializes 
-    the mlx camera on I2C bus 2 which is pins PB10 and PB11. Initializes 
-    SERVO TODO --------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------
+    PB6. Initializes the motor to rotate the turret on pins PC1, PA0, PA1,
+    timer 5. Initializes the encoder reader on pins PC6, PC7, timer 8. 
+    Initializes the proportional controller with this motor driver and 
+    this encoder reader. Initializes the mlx camera on I2C bus 2 which is 
+    pins PB10 and PB11. Initializes SERVO
     @param      None.
     @returns    Tuple of objects initialized. Returns objects in order: 
-                (start button, on board LED, motor driver, encoder reader, 
-                proportional controller, mlx camera).
+                (start button, motor driver, encoder reader, proportional 
+                controller, mlx camera).
     '''
     # initialize pin for active low start button
     sw1 = pyb.Pin(pyb.Pin.board.PB6, pyb.Pin.IN)
-    #initialize on board LED for start indication
-    board_LED = pyb.Pin(pyb.Pin.board.PA5, pyb.Pin.OUT_PP)
     # initialize motor driver for rotating turret
     motor = motor_driver.MotorDriver(
         pyb.Pin.board.PC1,
@@ -138,7 +127,86 @@ def parse_image(camera,image):
     @param      image -> Thermal image from MLX_Cam object.
     @returns    
     '''
-    pass
+
+
+def FSM_gen_fun():
+    '''!
+    This is a generator function that runs the finite state machine for the 
+    control of the turret processes.
+    @param      None.
+    @returns    Yields the current state of the FSM.
+    '''
+    # intialize objects
+    sw1, motor, encoder, pcontrol, camera = init_objects()
+    # initialize image
+    image = None
+    # initialize state to be the IDLE state
+    state = IDLE
+
+    # run the FSM
+    while True:
+        # yield the state about to be executed
+        yield state 
+
+        # check if is in IDLE state
+        if state == IDLE:
+            # check active low push button
+            if not sw1.value():
+                # if button pressed, next state is WAIT
+                state = WAIT
+        
+        # check if is in WAIT state
+        elif state == WAIT:
+            # wait 5 seconds
+            utime.sleep_ms(5000)
+            # next state is LOCATE
+            state = LOCATE
+
+        # check if is in LOCATE state
+        elif state == LOCATE:
+            # check for full image
+            if not image:
+                image = camera.get_image_nonblocking()
+                utime.sleep_ms(50) # shorter ? 
+                # don't change states
+                
+            else: # now have image
+                # next state is PARSE
+                state = PARSE
+
+        # check if is in PARSE state
+        elif state == PARSE:
+            # look through image for the most likely spot for person
+            # combine LOCATE and PARSE states ? 
+            pass
+        
+        # check if is in ROTATE state
+        elif state == ROTATE:
+            # actuate motor with proportional controller
+
+            # should just be for a set time ? 
+            #   that guarantees will hit the desired location ?
+            #   should test with gui to see results of new prop control
+
+            pass
+
+        # check if is in FIRE state
+        elif state == FIRE:
+            # actuate servo 
+            pass
+
+        # check if is in RESET state
+        elif state == RESET:
+            # reset values
+
+            # remove RESET state ?
+            pass
+
+        # otherwise, incorrect state value
+        else:
+            raise ValueError('Invalid state')
+    
+    # end while for FSM
 
 
 def main():
@@ -148,41 +216,16 @@ def main():
     @param      None.
     @returns    None.
     '''
-    # indicate initializing process
-    print(f'Initializing objects for turret control... ', end='')
-    # intialize objects
-    sw1, motor, encoder, pcontrol, camera = init_objects()
+    # initialize generator function(s)
+    turret_gen_fun = FSM_gen_fun()
 
-
-    # attempt turret process
+    # run the finite state machine
     try:
-        # poll for active low start button
-        while not sw1.value(): # keeps on checking until button press detected
-            pass
-        # illumninates on board LED once button press detected
-
-
-        # wait 5 seconds for opponent to position themselves
-        utime.sleep_ms(5000)
-
-        # capture thermal image
-        # parse thermal image for location of opponent
-        # rotate turret to desired location
-        # actuate servo to fire turret
-        # reset values
-
+        while True:
+            next(turret_gen_fun)
         
-        # indicate done with process
-        print(f'Turning off turret.')
-
-
     except KeyboardInterrupt:
-        # set motor to zero
-        motor.set_duty_cycle(0)
-        # set servo to zero (opposite of trigger actuation)
-        # servo.zero()
-        # indicate exitting main
-        print(f'\nExitting main due to KeyboardInterrupt\n\n')
+        print(f'\nExitting main due to a KeyboardInterrupt.\n\n')
 
 
 # This main code is run if this file is the main program but won't run if this
