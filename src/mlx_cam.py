@@ -151,9 +151,9 @@ class MLX_Cam:
         '''!
         @brief      Generate a string containing image data in CSV format.
         @details    This functiton generates a set of lines, each having one row of
-                    image data in Comma Separated Varaible format. The lnes can 
+                    image data in Comma Separated Variable format. The lines can 
                     be printed or saved to a file useing a @c for loop.
-        @param      array -> The array of dta to be presented.
+        @param      array -> The array of data to be presented.
         @param      limits -> A 2-iterable containing the maximum and minimum values
                     to which the data should be scaled or @c None for no scaling.
         @returns    None.
@@ -172,6 +172,36 @@ class MLX_Cam:
                 if col:
                     line += ","
                 line += f"{pix}"
+            yield line
+        return
+    
+    def get_num_csv(self, array, limits=None):
+        '''!
+        @brief      Generate a list containing image data in CSV format.
+        @details    This functiton generates a set of lines, each having one row of
+                    image data in Comma Separated Variable format. The lines can 
+                    be printed or saved to a file useing a @c for loop.
+        @param      array -> The array of data to be presented.
+        @param      limits -> A 2-iterable containing the maximum and minimum values
+                    to which the data should be scaled or @c None for no scaling.
+        @returns    None.
+        '''
+        if limits and len(limits) == 2:
+            scale = (limits[1] - limits[0]) / (max(array) - min(array))
+            offset = limits[0] - min(array)
+        else:
+            offset = 0.0
+            scale = 1.0
+        for row in range(self._height):
+            # line = ""
+            line = []
+            for col in range(self._width):
+                pix = int((array[row * self._width + (self._width - col - 1)]
+                          + offset) * scale)
+                # if col:
+                #     line += ","
+                # line += f"{pix}"
+                line.append(pix)
             yield line
         return
 
