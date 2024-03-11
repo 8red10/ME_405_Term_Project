@@ -317,7 +317,8 @@ def test_MLX_cam():
 
     print ("Done.")
 
-
+# This main code is run if this file is the main program but won't run if this
+# file is imported as a module by some other main program
 if __name__ == "__main__":
 
     test_MLX_cam()
