@@ -33,6 +33,13 @@
             RESET state:    waits here until positions of the turret are
                             manually reset.
 
+
+            Camera qwiic connection: 
+            Black wire      = ground
+            Red wire        = 3V3
+            Blue wire       = SDA (I2C bus 1 = PB9; I2C bus 2 = PB11)
+            Yellow wire     = SCL (I2C bus 1 = PB8; I2C bus 2 = PB10)
+
                             
 @authors    Jack Krammer and Jason Chang
 @date       12-Mar-2024
@@ -54,13 +61,17 @@ import task_share
 import gc
 
 # global constants
-ENCODER_COUNT_PER_REV   = 16384
+ENCODER_COUNT_PER_REV   = 16384 # TODO
 MOTOR_CONTROL_INTERVAL  = 10        # milliseconds
 MOTOR_CONTROL_PERIOD    = 2000      # milliseconds
 MOTOR_CONTROL_POINTS    = MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL
+MOTOR_ACTUATE_THRESH    = 15        # duty cycle %      # TODO
+ROTATE_POS_THRESH       = 100       # encoder counts    # TODO
 THERMAL_LIMITS          = (0,100)
 BUTTON_TASK_INTERVAL    = 10        # milliseconds
-IMAGE_TASK_INTERVAL     = 130       # milliseconds
+IMAGE_TASK_INTERVAL     = 160       # milliseconds
+SERVO_START_POS         = 2.0       # pulse width (milliseconds)
+SERVO_PULLED_POS        = 1.65      # pulse width (milliseconds)
 
 # global wait time constants
 WAIT_TIME               = 5000      # milliseconds
@@ -152,8 +163,8 @@ class turret_gen_class:
             channel_num=2,
             period=19999,
             ps=79)
-        # initialize servo to farthest position clockwise
-        self.servo.set_pulse_width(1.0)
+        # initialize servo to farthest position counter clockwise
+        self.servo.set_pulse_width(SERVO_START_POS)
         # initialize image
         self.image = None
         # initialize loop value
@@ -426,7 +437,7 @@ class turret_gen_class:
                 # check if still need to wait for servo to finish moving
                 if self.loop_val <= SERVO_WAIT_TIME // MOTOR_CONTROL_INTERVAL:
                     # actuate servo to fire the turret
-                    self.servo.set_pulse_width(2.0)
+                    self.servo.set_pulse_width(SERVO_START_POS)
                     # increment loop_val
                     self.loop_val += 1
                 # otherwise, done firing the turret
@@ -486,9 +497,13 @@ class turret_gen_class:
             elif state == INIT:
                 # indicate process started with LED
                 self.led.high()
-                # initialize setpoint to be zero
-                self.setpoint = 0
-                self.pcontrol.set_setpoint(0)
+                # intialize servo to farthest counter clockwise position
+                self.servo.set_pulse_width(SERVO_START_POS)
+                # initialize proportional controller setpoint to be in line with the camera
+                #   in line with camera = 0 degrees from camera reference
+                #   in line with camera = 180 degrees from initial turret direction
+                self.setpoint = self.turret_angle_to_encoder_val(0)
+                self.pcontrol.set_setpoint(self.setpoint)
                 # initialize this turret position to be zero
                 self.encoder.zero()
                 # next state is WAIT
@@ -515,6 +530,7 @@ class turret_gen_class:
             else:
                 raise ValueError(f'Incorrect state for button task. Value was {state}.')
         # end while
+        # TODO
         
     def image_task_gen_fun(self):
         '''!
@@ -528,25 +544,49 @@ class turret_gen_class:
         '''
         # initialize the state variable
         state = CAPTURE
+        # initialize the wait counter 
+        wait_counter = 0
         # run the FSM
         while True:
             # yield the state that will execute next
             yield state
             # CAPTURE state
             if state == CAPTURE:
-                # check that the start flag has been set (i.e. done waiting 5s)
+                # check that the start flag has been set (i.e. done with initial wait)
                 if self.start_flag:
-                    pass
+                    # check for image
+                    if not self.image:
+                        # try to get the image
+                        self.image = self.camera.get_image_nonblocking()
+                    # otherwise, got the image
+                    else:
+                        # next state is PARSE
+                        state = PARSE
             # PARSE state
             elif state == PARSE:
-                pass
+                # check if is first time in this state
+                if wait_counter == 0:
+                    # derive setpoint from image data
+                    self.setpoint = self.parse_image(self.camera,self.image)
+                    # increment the wait counter
+                    wait_counter += 1
+                # check if done waiting for motor to rotate, and is time to get another image
+                elif wait_counter >= MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL:
+                    # reset wait counter
+                    wait_counter = 0
+                    # next state is CAPTURE
+                    state = CAPTURE
+                # otherwise, have already set the setpoint for this image
+                else:
+                    # increment wait counter
+                    wait_counter += 1
+                # next state is CAPTURE
+                state = CAPTURE
             # handle bad values for state
             else:
                 raise ValueError(f'Incorrect state for image task. Value was {state}.')
         # end while
-
         # TODO
-        pass
     
     def rotate_task_gen_fun(self):
         '''!
@@ -559,6 +599,8 @@ class turret_gen_class:
         '''
         # initialize the state variable
         state = RUN
+        # initialize wait counter
+        wait_counter = 0
         # run the FSM
         while True:
             # yield the state that will execute next
@@ -567,17 +609,51 @@ class turret_gen_class:
             if state == RUN:
                 # check that the start flag has been set
                 if self.start_flag:
-                    pass
+                    # check if it is the first time in this state
+                    if wait_counter == 0:
+                        # get the start time
+                        self.start_time = utime.ticks_ms()
+                        # increment the wait counter
+                        wait_counter += 1
+                    # check if done rotating the turret
+                    if wait_counter >= MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL:
+                        # reset wait counter
+                        wait_counter = 0
+                        # next state is FIRE
+                        state = FIRE
+                    # set the setpoint in the proportional controller
+                    self.pcontrol.set_setpoint(self.setpoint)
+                    # run the proportional controller
+                    self.pcontrol.run(MOTOR_CONTROL_INTERVAL,self.start_time)
+                    # increment the wait counter
+                    wait_counter += 1
             # FIRE state
             elif state == FIRE:
-                pass
+                # check if is first time in this state
+                if wait_counter == 0:
+                    # actuate servo to pull trigger
+                    self.servo.set_pulse_width(SERVO_PULLED_POS)
+                    # increment wait counter
+                    wait_counter += 1
+                # check if done waiting
+                elif wait_counter >= SERVO_WAIT_TIME // MOTOR_CONTROL_INTERVAL:
+                    # reset servo to initial position
+                    self.servo.set_pulse_width(SERVO_START_POS)
+                    # reset wait counter
+                    wait_counter = 0
+                    # next state is RUN
+                    state = RUN
+                    # turn off start flag
+                    self.start_flag = 0
+                # otherwise, wait for servo to move
+                else:
+                    # increment wait counter
+                    wait_counter += 1
             # handle bad state values
             else:
                 raise ValueError(f'Incorrect state value for rotate task. Value was {state}.')
         # end while
-            
         # TODO
-        pass
 
 def main():
     '''!
