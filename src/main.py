@@ -46,7 +46,8 @@ import motor_driver
 import encoder_reader
 import proportional_controller
 import mlx_cam
-from array import array
+import servo_driver
+# from array import array
 import math
 import cotask
 import task_share
@@ -58,6 +59,8 @@ MOTOR_CONTROL_INTERVAL  = 10        # milliseconds
 MOTOR_CONTROL_PERIOD    = 2000      # milliseconds
 MOTOR_CONTROL_POINTS    = MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL
 THERMAL_LIMITS          = (0,100)
+BUTTON_TASK_INTERVAL    = 10        # milliseconds
+IMAGE_TASK_INTERVAL     = 130       # milliseconds
 
 # global wait time constants
 WAIT_TIME               = 5000      # milliseconds
@@ -69,15 +72,22 @@ PERP_DIST_CAMERA_TO_TARGET      = 8     # feet
 PERP_DIST_TURRET_TO_TARGET      = 14    # feet
 CAMERA_FOV_ANGLE                = 55    # degrees
 
-# global state variables
-IDLE    = 1
-WAIT    = 2
-LOCATE  = 3
-PARSE   = 4
-ROTATE  = 5
+# turret button FSM states
+CHECK   = 1
+INIT    = 2
+WAIT    = 3
+DONE    = 4
+# turret rotate FSM states
+RUN     = 5
 FIRE    = 6
-RESET   = 7
-
+# turret image FSM states
+CAPTURE = 7
+PARSE   = 8
+# old state variables
+IDLE    = 9
+LOCATE  = 10
+ROTATE  = 11
+RESET   = 12
 
 class turret_gen_class:
     '''!
@@ -93,16 +103,9 @@ class turret_gen_class:
         motor to rotate the turret on pins PC1, PA0, PA1, timer 5. Initializes 
         the encoder reader on pins PC6, PC7, timer 8. Initializes the proportional 
         controller with this motor driver and this encoder reader. Initializes 
-        the mlx camera on I2C bus 2 which is pins PB10 and PB11. Initializes 
-        SERVO TODO --------------------------------------------------------------------------------------------------------
-        -------------------------------------------------------------------------------------------------------------------
-        -------------------------------------------------------------------------------------------------------------------
-        -------------------------------------------------------------------------------------------------------------------
-        -------------------------------------------------------------------------------------------------------------------
-        -------------------------------------------------------------------------------------------------------------------
-        -------------------------------------------------------------------------------------------------------------------
-        -------------------------------------------------------------------------------------------------------------------
-        -------------------------------------------------------------------------------------------------------------------
+        the mlx camera on I2C bus 2 which is pins PB10 and PB11. Initializes the 
+        servo on pin PB3, timer 2 to have a 20ms period and in its initial 
+        position.
         @param      task_name -> String representing the name of this task.
         @returns    None.
         '''
@@ -110,11 +113,11 @@ class turret_gen_class:
         print(f'Initializing objects for turret control... ', end='')
         # initializes task name
         self.task_name = task_name
-        # intializes state to IDLE
-        self.state = IDLE
+        # intialize start process flag
+        self.start_flag = 0
         # initialize pin for active low start button
         self.sw1 = pyb.Pin(pyb.Pin.board.PC2, pyb.Pin.IN)
-        #initialize on board LED for start indication
+        # initialize on board LED for start indication
         self.led = pyb.Pin(pyb.Pin.board.PA5, pyb.Pin.OUT_PP)
         self.led.low()
         # initialize motor driver for rotating turret
@@ -143,7 +146,14 @@ class turret_gen_class:
         self.camera = mlx_cam.MLX_Cam(i2c=pyb.I2C(2))
         self.camera._camera.refresh_rate = 10.0
         # initialize servo
-        self.servo = None #TODO
+        self.servo = servo_driver.ServoDriver(
+            pin=pyb.Pin.board.PB3,
+            timer_num=2,
+            channel_num=2,
+            period=19999,
+            ps=79)
+        # initialize servo to farthest position clockwise
+        self.servo.set_pulse_width(1.0)
         # initialize image
         self.image = None
         # initialize loop value
@@ -152,8 +162,42 @@ class turret_gen_class:
         self.setpoint = 0
         # initialize start time
         self.start_time = utime.ticks_ms()
+
         # indicate done initializing objects
         print(f'Done.')
+
+
+    def get_start_button(self):
+        '''!
+        Returns the active low start button object.
+        @param      None.
+        @returns    Pin object to read the active low start button value from.
+        '''
+        return self.sw1
+
+    def get_motor(self):
+        '''!
+        Returns the motor driver object associated with this turret.
+        @param      None.
+        @returns    The MotorDriver object used to rotate this turret.
+        '''
+        return self.motor
+
+    def get_servo(self):
+        '''!
+        Returns the servo driver object associated with this turret.
+        @param      None.
+        @returns    The ServoDriver object used to fire this turret.
+        '''
+        return self.servo
+
+    def get_led(self):
+        '''!
+        Returns the pin object used to actuate the builtin LED LD2.
+        @param      None.
+        @returns    Pin object to set the value of the builtin LED to.
+        '''
+        return self.led
     
     def turret_angle_to_encoder_val(self,angle):
         '''!
@@ -285,19 +329,21 @@ class turret_gen_class:
         @param      None.
         @returns    Yields the state to run next.
         '''
+        # initialize state for
+        state = IDLE
         # run the finite state machine
         while True:
             # yield the state about to run next
-            yield self.state
+            yield state
 
             # check if is in IDLE state
-            if self.state == IDLE:
+            if state == IDLE:
                 # check active low start button
                 if not self.sw1.value():
                     # indicate button pressed
                     self.led.high()
                     # next state is WAIT
-                    self.state = WAIT
+                    state = WAIT
                     print('Done with IDLE state.')
                     print('Starting turret process.')
                 # otherwise, idle while waiting for start signal
@@ -307,20 +353,20 @@ class turret_gen_class:
                     self.encoder.zero()
             
             # check if is in WAIT state
-            elif self.state == WAIT:
+            elif state == WAIT:
                 # check if completed wait duration
                 if self.loop_val >= WAIT_TIME // MOTOR_CONTROL_INTERVAL:
                     # reset loop value
                     self.loop_val = 0
                     # next state is LOCATE
-                    self.state = LOCATE
+                    state = LOCATE
                     print('Done with WAIT state.')
                 # otherwise, increment loop value
                 else:
                     self.loop_val += 1
 
             # check if is in LOCATE state
-            elif self.state == LOCATE:
+            elif state == LOCATE:
                 # check for full image
                 if not self.image:
                     # check if completed image wait duration
@@ -339,21 +385,21 @@ class turret_gen_class:
                     # reset loop value
                     self.loop_val = 0
                     # next state is PARSE
-                    self.state = PARSE
+                    state = PARSE
                     print('Done with LOCATE state.')
 
             # check if is in PARSE state
-            elif self.state == PARSE:
+            elif state == PARSE:
                 # parse image for target direction
                 self.setpoint = self.parse_image(self.camera,self.image)
                 # set the setpoint of the proportional controller
                 self.pcontrol.set_setpoint(self.setpoint)
                 # next state is ROTATE
-                self.state = ROTATE
+                state = ROTATE
                 print('Done with PARSE state.')
             
             # check if is in ROTATE state
-            elif self.state == ROTATE:
+            elif state == ROTATE:
                 # actuate motor with proportional controller
 
                 # check if is the first time in this state
@@ -372,28 +418,28 @@ class turret_gen_class:
                     # reset the loop value
                     self.loop_val = 0
                     # next state is FIRE
-                    self.state = FIRE
+                    state = FIRE
                     print('Done with ROTATE state.')
 
             # check if is in FIRE state
-            elif self.state == FIRE:
+            elif state == FIRE:
                 # check if still need to wait for servo to finish moving
                 if self.loop_val <= SERVO_WAIT_TIME // MOTOR_CONTROL_INTERVAL:
-                    # actuate servo to set level
-                    self.servo = None #TODO
+                    # actuate servo to fire the turret
+                    self.servo.set_pulse_width(2.0)
                     # increment loop_val
                     self.loop_val += 1
                 # otherwise, done firing the turret
                 else:
                     # next state is RESET
-                    self.state = RESET
+                    state = RESET
                     print('Done with FIRE state.')
 
             # check if is in RESET state
-            elif self.state == RESET:
+            elif state == RESET:
                 # reset values
                 self.motor.set_duty_cycle(0)
-                self.servo = None #TODO
+                self.servo.set_pulse_width(1.0)
                 self.led.low()
                 self.image = None
                 self.loop_val = 0
@@ -406,35 +452,178 @@ class turret_gen_class:
                 print('Done with turret process.')
                 
                 # next state is IDLE
-                self.state = IDLE
+                state = IDLE
 
             # otherwise, incorrect state value
             else:
                 raise ValueError('Invalid state')
+        # end while
             
+    def button_task_gen_fun(self):
+        '''!
+        This generator function funs the state machine for the button task.
+        Constantly checks the state of the active low start button. After
+        the button is pressed, initializes values for this to be the start
+        position and waits 5 seconds for opponents to position themself.
+        @param      None.
+        @returns    None.
+        '''
+        # initialize state
+        state = CHECK
+        # initialize wait counter
+        wait_counter = 0
+        # run the FSM
+        while True:
+            # yield the state about to execute
+            yield state
+            # CHECK state
+            if state == CHECK:
+                # check if the active low button is pressed
+                if not self.sw1.value():
+                    # next state is INIT
+                    state = INIT
+            # INIT state
+            elif state == INIT:
+                # indicate process started with LED
+                self.led.high()
+                # initialize setpoint to be zero
+                self.setpoint = 0
+                self.pcontrol.set_setpoint(0)
+                # initialize this turret position to be zero
+                self.encoder.zero()
+                # next state is WAIT
+                state = WAIT
+            # WAIT state
+            elif state == WAIT:
+                # check if done waiting
+                if wait_counter >= WAIT_TIME // BUTTON_TASK_INTERVAL:
+                    # set start flag
+                    self.start_flag = 1
+                    # reset wait_counter
+                    wait_counter = 0
+                    # next state is DONE
+                    state = DONE
+                # otherwise, still waiting
+                else:
+                    # increment wait counter
+                    wait_counter += 1
+            # DONE state
+            elif state == DONE:
+                # do nothing in this state bc done with button functionality
+                pass
+            # handle bad state values
+            else:
+                raise ValueError(f'Incorrect state for button task. Value was {state}.')
         # end while
         
+    def image_task_gen_fun(self):
+        '''!
+        This generator function runs the state machine for the image task.
+        Constantly tries to capture an image from the thermal camera. Once
+        a valid image is read, the location of the target is derived and 
+        stored in the setpoint attribute of this class for the turret task
+        to use as an input to the closed-loop proportional controller.
+        @param      None.
+        @returns    Yields the state of the FSM.
+        '''
+        # initialize the state variable
+        state = CAPTURE
+        # run the FSM
+        while True:
+            # yield the state that will execute next
+            yield state
+            # CAPTURE state
+            if state == CAPTURE:
+                # check that the start flag has been set (i.e. done waiting 5s)
+                if self.start_flag:
+                    pass
+            # PARSE state
+            elif state == PARSE:
+                pass
+            # handle bad values for state
+            else:
+                raise ValueError(f'Incorrect state for image task. Value was {state}.')
+        # end while
+
+        # TODO
+        pass
+    
+    def rotate_task_gen_fun(self):
+        '''!
+        This generator function runs thet state machine for the rotate task.
+        This task runs a closed loop proportional controller to aim the 
+        turret. Then after a globally defined interval, will actuate the 
+        servo and fire the Nerf dart.
+        @param      None.
+        @returns    Yields the state of the FSM.
+        '''
+        # initialize the state variable
+        state = RUN
+        # run the FSM
+        while True:
+            # yield the state that will execute next
+            yield state
+            # RUN state
+            if state == RUN:
+                # check that the start flag has been set
+                if self.start_flag:
+                    pass
+            # FIRE state
+            elif state == FIRE:
+                pass
+            # handle bad state values
+            else:
+                raise ValueError(f'Incorrect state value for rotate task. Value was {state}.')
+        # end while
+            
+        # TODO
+        pass
 
 def main():
     '''!
     This function is only executed when this file is ran as the main file.
+    Runs the turret process as a task. 
     @param      None.
     @returns    None.
     '''
     # initialize the turret object
     turret = turret_gen_class('Turret 1')
-    # initialize the turret process generator function
-    turret_gen_fun = turret.turret_process_gen_fun()
-    # initialize the turret task
-    turret_task_1 = cotask.Task(turret_gen_fun, 
-                                name="Turret_Task_1", 
-                                priority=1, 
-                                period=MOTOR_CONTROL_INTERVAL,
-                                profile=True, 
-                                trace=False, 
-                                shares=None)
-    # add turret task to task list
-    cotask.task_list.append(turret_task_1)
+    # initialize the turret's button generator function
+    button_gen_fun = turret.button_task_gen_fun()
+    # initialize the turret's rotate generator function
+    rotate_gen_fun = turret.rotate_task_gen_fun()
+    # initialize the turret's image generator function
+    image_gen_fun = turret.image_task_gen_fun()
+    # initialize the button task
+    button_task = cotask.Task(button_gen_fun,
+                              name="Button_Task",
+                              priority=0,                       # TODO
+                              period=BUTTON_TASK_INTERVAL,      # TODO
+                              profile=True,
+                              trace=False,
+                              shares=None)
+    # initialize the rotate task
+    rotate_task = cotask.Task(rotate_gen_fun, 
+                              name="Rotate_Task", 
+                              priority=1,                       # TODO
+                              period=MOTOR_CONTROL_INTERVAL,    # TODO
+                              profile=True, 
+                              trace=False, 
+                              shares=None)
+    # initialize the image task
+    image_task = cotask.Task(image_gen_fun,
+                             name="Image_Task",
+                             priority=2,                # TODO
+                             period=IMAGE_WAIT_TIME,    # TODO
+                             profile=True,
+                             trace=False,
+                             shares=None)
+    # add button task to task list
+    cotask.task_list.append(button_task)
+    # add rotate task to task list
+    cotask.task_list.append(rotate_task)
+    # add image task to task list
+    cotask.task_list.append(image_task)
 
     # Run the memory garbage collector to ensure memory is as defragmented as
     # possible before the real-time scheduler is started
@@ -442,16 +631,23 @@ def main():
 
     # attempt turret process
     try:
+        # get the active low start button object
+        button = turret.get_start_button()
+        # continuously check if the button is pressed
+        while not button.value():
+            pass
+        # button has been pressed, run tasks
         while True:
             cotask.task_list.pri_sched()
 
+    # caught the Ctrl+C (^C) signal
     except KeyboardInterrupt:
-        # set motor to zero
-        turret.motor.set_duty_cycle(0)
-        # set servo to zero (opposite of trigger actuation)
-        #turret.servo.zero() #TODO
+        # turn off servo
+        turret.get_servo().zero()
+        # turn motor off
+        turret.get_motor().set_duty_cycle(0)
         # turn builtin LED off
-        turret.led.low()
+        turret.get_led().low()
         # indicate exitting main
         print(f'\nExitting main due to KeyboardInterrupt\n\n')
 
@@ -459,5 +655,7 @@ def main():
 # This main code is run if this file is the main program but won't run if this
 # file is imported as a module by some other main program
 if __name__ == '__main__':
+
     main()
+    
 
