@@ -94,7 +94,7 @@ class ServoDriver:
         # initialize the channel to use for PWM
         self.channel = self.timer.channel(channel_num,pyb.Timer.PWM,pin=self.pin)
         # put the servo to its neutral position
-        self.set_pulse_width(1.5)
+        self.set_pulse_width(0)
 
     def get_whole_period(self):
         '''!
@@ -174,7 +174,12 @@ def test_servo():
                         ps=79)
     
     # test servo
-    servo.set_pulse_width(1.0)
+    # pull the trigger 
+    servo.set_pulse_width(1.65)
+    # wait 2 seconds
+    utime.sleep_ms(2000)
+    # initial position = trigger not pressed
+    servo.set_pulse_width(2.0)
 
     # wait for KeyboardInterrupt before cleaning up and exitting
     try:
