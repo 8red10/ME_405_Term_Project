@@ -103,7 +103,7 @@ class test_gen_fun():
         @param      data -> A list of number data (data should be integers).
         @returns    The center of mass of the input line of data.
         '''
-        # return index pf max of row with largest mean
+        # return index of max of row with largest mean
         return data.index(max(data))
     
         # TODO PREVIOUS METHOD BELOW
@@ -464,6 +464,36 @@ def start_button_test():
     except KeyboardInterrupt:
         print('\nKeyboardInterrupt detected. Exitting start button test.\n')
 
+def simple_motor_test():
+    '''!
+    This function provides a simple test of the motor.
+    @param      None.
+    @returns    None.
+    '''
+    # indicate starting simple motor test
+    print('Starting simple motor test.')
+    # initialize motor 
+    motor = motor_driver.MotorDriver(
+        pyb.Pin.board.PC1,
+        pyb.Pin.board.PA0, 
+        pyb.Pin.board.PA1,
+        timer=5)
+    motor.set_duty_cycle(0)
+    # stop when a KeyboardInterrupt is detected
+    try:
+        # turn on motor
+        motor.set_duty_cycle(-100)
+        while True:
+            pass
+    except KeyboardInterrupt:
+        # turn off motor
+        motor.set_duty_cycle(0)
+        # indicate caught interrupt
+        print('\nKeyboardInterrupt detected. Motor turned off.\n')
+    
+    # indicate done with simple motor test
+    print('Done with simple motor test.')
+
 def main():
     '''!
     This function only runs when this file is ran as the main file.
@@ -472,9 +502,10 @@ def main():
     '''
     # test_camera_nonblock()
     # test_encoder_setup()
-    test_new_pcontrol()
+    # test_new_pcontrol()
     # start_button_test()
     # test_camera_data_no_class()
+    simple_motor_test()
 
     # indicate done with main
     print('Done with main of test.py\n')
