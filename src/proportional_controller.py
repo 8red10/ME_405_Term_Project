@@ -210,8 +210,9 @@ class ProportionalController:
         @returns    None.
         '''
         # check that the input Kd value is a number
-        if (type(Kd) is not float) or (type(Kd) is not int):
-            raise ValueError('Kd value should be a number.')
+        if type(Kd) is not float:
+            if type(Kd) is not int:
+                raise ValueError('Kd value should be a number.')
         
         # sets the derivative gain
         self.Kd = Kd
