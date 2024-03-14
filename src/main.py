@@ -63,25 +63,25 @@ import gc
 
 # global constants
 ENCODER_COUNT_PER_REV   = 98218 #16384 # TODO
-MOTOR_CONTROL_INTERVAL  = 10        # milliseconds
+MOTOR_CONTROL_INTERVAL  = 20        # milliseconds
 MOTOR_CONTROL_PERIOD    = 2000      # milliseconds
 MOTOR_CONTROL_POINTS    = MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL
-MOTOR_ACTUATE_THRESH    = 15        # duty cycle %      # TODO
-ROTATE_POS_THRESH       = 100       # encoder counts    # TODO
+MOTOR_ACTUATION_THRESH  = 15        # duty cycle (%)      # TODO
+# ROTATE_POS_THRESH       = 100       # encoder counts    # TODO
 THERMAL_LIMITS          = (0,100)
 BUTTON_TASK_INTERVAL    = 10        # milliseconds
 IMAGE_TASK_INTERVAL     = 160       # milliseconds
 SERVO_START_POS         = 2.0       # pulse width (milliseconds)
-SERVO_PULLED_POS        = 1.65      # pulse width (milliseconds)
+SERVO_PULLED_POS        = 1.35       # pulse width (milliseconds)
 
 # global wait time constants
 WAIT_TIME               = 5000      # milliseconds
-IMAGE_WAIT_TIME         = 50        # milliseconds
+# IMAGE_WAIT_TIME         = 50        # milliseconds
 SERVO_WAIT_TIME         = 2000      # milliseconds
 
 # global geometric placement variables
-PERP_DIST_CAMERA_TO_TARGET      = 9 #8     # feet
-PERP_DIST_TURRET_TO_TARGET      = 17 #14    # feet
+PERP_DIST_CAMERA_TO_TARGET      = 9     # feet
+PERP_DIST_TURRET_TO_TARGET      = 17    # feet
 CAMERA_FOV_ANGLE                = 55    # degrees
 
 # turret button FSM states
@@ -125,8 +125,6 @@ class turret_gen_class:
         print(f'Initializing objects for turret control... ', end='')
         # initializes task name
         self.task_name = task_name
-        # intialize start process flag
-        self.start_flag = 0
         # initialize pin for active low start button
         self.sw1 = pyb.Pin(pyb.Pin.board.PC2, pyb.Pin.IN)
         # initialize on board LED for start indication
@@ -147,8 +145,8 @@ class turret_gen_class:
         self.encoder.zero()
         # initialize proportional controller
         self.pcontrol = proportional_controller.ProportionalController(
-            Kp=0,   #1.0    #TODO
-            Kd=0,   #0.2    #TODO
+            Kp=0.058,
+            Kd=0.001,
             setpoint=0,
             setvel=0,
             actuate=self.motor.set_duty_cycle,
@@ -164,10 +162,16 @@ class turret_gen_class:
             channel_num=2,
             period=19999,
             ps=79)
+        # intialize start process flag
+        self.start_flag = 0
+        # initialize image flag
+        self.image_flag = 0
         # initialize servo to farthest position counter clockwise
         self.servo.set_pulse_width(SERVO_START_POS)
         # initialize image
         self.image = None
+        # initialize previous image
+        self.prev_image = None
         # initialize loop value
         self.loop_val = 0
         # initialize setpoint
@@ -211,6 +215,38 @@ class turret_gen_class:
         '''
         return self.led
     
+    def get_camera(self):
+        '''!
+        Returns the camera object used to get thermal images.
+        @param      None.
+        @returns    MLX_Cam object to get images and image info.
+        '''
+        return self.camera
+    
+    def get_image(self):
+        '''!
+        Returns the current image obtained from this turret process.
+        @param      None.
+        @returns    The current thermal image.
+        '''
+        return self.image
+    
+    def get_prev_image(self):
+        '''!
+        Returns the previous image obtained from this thermal process.
+        @param      None.
+        @returns    The previous thermal image.
+        '''
+        return self.prev_image
+    
+    def get_setpoint(self):
+        '''!
+        Returns the current setpoint of this turret process.
+        @param      None.
+        @returns    The current setpoint.
+        '''
+        return self.setpoint
+    
     def turret_angle_to_encoder_val(self,angle):
         '''!
         Converts the input angle to an encoder value for the turret. The 
@@ -232,25 +268,19 @@ class turret_gen_class:
 
     def get_center_of_mass(self,data:list[int]):
         '''!
-        Calculates the center of mass of the line of integer data. Uses the 
-        indices of the data as the weights on the data. If the list is empty,
-        returns 0
+        Looks at the list of thermal values and returns the column index that 
+        best represents the target position. Does this by getting the index 
+        of the maximum value. If the list is empty, returns 0.
         @param      data -> A list of number data (data should be integers).
-        @returns    The center of mass of the input line of data.
+        @returns    The column index to aim to.
         '''
         # check for an empty list
         if not len(data):
             return 0
-        
-        # otherwise, data is present, calculate the center of mass
-        weighted_mass = 0
-        total_mass = 0
-        for idx, val in enumerate(data):
-            weighted_mass += idx * val
-            total_mass += val
-        
-        # return the center of mass = weighted mass / total mass
-        return weighted_mass / total_mass
+        # otherwise, data is present, get the best position
+        else:
+            # return index of max of row with largest mean
+            return data.index(max(data))
 
     def center_of_mass_to_degrees(self,cm):
         '''!
@@ -333,144 +363,6 @@ class turret_gen_class:
         # return the direction in units of encoder counts
         return enc_dir
 
-    def turret_process_gen_fun(self):
-        '''!
-        The generator function used to run the finite state machine of the turret
-        process as a task. Locates opponent, rotates turret towards opponent, and 
-        fires the Nerf dart.
-        @param      None.
-        @returns    Yields the state to run next.
-        '''
-        # initialize state for
-        state = IDLE
-        # run the finite state machine
-        while True:
-            # yield the state about to run next
-            yield state
-
-            # check if is in IDLE state
-            if state == IDLE:
-                # check active low start button
-                if not self.sw1.value():
-                    # indicate button pressed
-                    self.led.high()
-                    # next state is WAIT
-                    state = WAIT
-                    print('Done with IDLE state.')
-                    print('Starting turret process.')
-                # otherwise, idle while waiting for start signal
-                else:
-                    # keep values low
-                    self.motor.set_duty_cycle(0)
-                    self.encoder.zero()
-            
-            # check if is in WAIT state
-            elif state == WAIT:
-                # check if completed wait duration
-                if self.loop_val >= WAIT_TIME // MOTOR_CONTROL_INTERVAL:
-                    # reset loop value
-                    self.loop_val = 0
-                    # next state is LOCATE
-                    state = LOCATE
-                    print('Done with WAIT state.')
-                # otherwise, increment loop value
-                else:
-                    self.loop_val += 1
-
-            # check if is in LOCATE state
-            elif state == LOCATE:
-                # check for full image
-                if not self.image:
-                    # check if completed image wait duration
-                    if self.loop_val <= 0:
-                        # check for image
-                        self.image = self.camera.get_image_nonblocking()
-                        # reset loop value
-                        self.loop_val = IMAGE_WAIT_TIME // MOTOR_CONTROL_INTERVAL
-                    # otherwise, continue with image wait duration
-                    else:
-                        # decrement loop value
-                        self.loop_val -= 1
-                
-                # otherwise, have the image
-                else:
-                    # reset loop value
-                    self.loop_val = 0
-                    # next state is PARSE
-                    state = PARSE
-                    print('Done with LOCATE state.')
-
-            # check if is in PARSE state
-            elif state == PARSE:
-                # parse image for target direction
-                self.setpoint = self.parse_image(self.camera,self.image)
-                # set the setpoint of the proportional controller
-                self.pcontrol.set_setpoint(self.setpoint)
-                # next state is ROTATE
-                state = ROTATE
-                print('Done with PARSE state.')
-            
-            # check if is in ROTATE state
-            elif state == ROTATE:
-                # actuate motor with proportional controller
-
-                # check if is the first time in this state
-                if self.loop_val == 0:
-                    # initialize start time
-                    self.start_time = utime.ticks_ms()
-                
-                # execute proportional controller desired number of times
-                if self.loop_val <= MOTOR_CONTROL_POINTS:
-                    # run the proportional controller
-                    self.pcontrol.run(MOTOR_CONTROL_INTERVAL,self.start_time)
-                    # increment the number of times 
-                    self.loop_val += 1
-                # otherwise, done with rotating
-                else:
-                    # reset the loop value
-                    self.loop_val = 0
-                    # next state is FIRE
-                    state = FIRE
-                    print('Done with ROTATE state.')
-
-            # check if is in FIRE state
-            elif state == FIRE:
-                # check if still need to wait for servo to finish moving
-                if self.loop_val <= SERVO_WAIT_TIME // MOTOR_CONTROL_INTERVAL:
-                    # actuate servo to fire the turret
-                    self.servo.set_pulse_width(SERVO_START_POS)
-                    # increment loop_val
-                    self.loop_val += 1
-                # otherwise, done firing the turret
-                else:
-                    # next state is RESET
-                    state = RESET
-                    print('Done with FIRE state.')
-
-            # check if is in RESET state
-            elif state == RESET:
-                # reset values
-                self.motor.set_duty_cycle(0)
-                self.servo.set_pulse_width(1.0)
-                self.led.low()
-                self.image = None
-                self.loop_val = 0
-                self.setpoint = 0
-                self.pcontrol.set_setpoint(0)
-                self.encoder.zero()
-
-                # indicate done with turret process
-                print('Done with RESET state.')
-                print('Done with turret process.')
-                
-                # next state is IDLE
-                state = IDLE
-
-            # otherwise, incorrect state value
-            else:
-                raise ValueError('Invalid state')
-        # end while
-            
     def button_task_gen_fun(self):
         '''!
         This generator function funs the state machine for the button task.
@@ -497,6 +389,7 @@ class turret_gen_class:
             # INIT state
             elif state == INIT:
                 # indicate process started with LED
+                print('Got button press.')
                 self.led.high()
                 # intialize servo to farthest counter clockwise position
                 self.servo.set_pulse_width(SERVO_START_POS)
@@ -513,8 +406,12 @@ class turret_gen_class:
             elif state == WAIT:
                 # check if done waiting
                 if wait_counter >= WAIT_TIME // BUTTON_TASK_INTERVAL:
+                    # set image flag
+                    self.image_flag = 1
                     # set start flag
                     self.start_flag = 1
+                    # turn LED off to show done waiting, for debugging # TODO
+                    self.led.low()
                     # reset wait_counter
                     wait_counter = 0
                     # next state is DONE
@@ -553,8 +450,8 @@ class turret_gen_class:
             yield state
             # CAPTURE state
             if state == CAPTURE:
-                # check that the start flag has been set (i.e. done with initial wait)
-                if self.start_flag:
+                # check that the start flag has been set (i.e. done with initial wait, ok to capture an image)
+                if self.image_flag:
                     # check for image
                     if not self.image:
                         # try to get the image
@@ -562,27 +459,38 @@ class turret_gen_class:
                     # otherwise, got the image
                     else:
                         # next state is PARSE
+                        print('Got image.')
                         state = PARSE
             # PARSE state
             elif state == PARSE:
-                # check if is first time in this state
-                if wait_counter == 0:
-                    # derive setpoint from image data
-                    self.setpoint = self.parse_image(self.camera,self.image)
-                    # increment the wait counter
-                    wait_counter += 1
-                # check if done waiting for motor to rotate, and is time to get another image
-                elif wait_counter >= MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL:
-                    # reset wait counter
-                    wait_counter = 0
-                    # next state is CAPTURE
-                    state = CAPTURE
-                # otherwise, have already set the setpoint for this image
-                else:
-                    # increment wait counter
-                    wait_counter += 1
+                # # check if is first time in this state
+                # if wait_counter == 0:
+                #     # derive setpoint from image data
+                #     self.setpoint = self.parse_image(self.camera,self.image)
+                #     # increment the wait counter
+                #     wait_counter += 1
+                # # check if done waiting for motor to rotate, and is time to get another image
+                # elif wait_counter >= MOTOR_CONTROL_PERIOD // IMAGE_TASK_INTERVAL:
+                #     # reset wait counter
+                #     wait_counter = 0
+                #     # next state is CAPTURE
+                #     state = CAPTURE
+                # # otherwise, have already set the setpoint for this image
+                # else:
+                #     # increment wait counter
+                #     wait_counter += 1
+
+                # derive setpoint from image data
+                print('Parsing image.')
+                self.setpoint = self.parse_image(self.camera, self.image)
+                # store this image
+                self.prev_image = self.image
+                # reset image to None for future captures
+                self.image = None
                 # next state is CAPTURE
                 state = CAPTURE
+                # turn off image flag so doesn't get another image
+                self.image_flag = 0
             # handle bad values for state
             else:
                 raise ValueError(f'Incorrect state for image task. Value was {state}.')
@@ -608,43 +516,59 @@ class turret_gen_class:
             yield state
             # RUN state
             if state == RUN:
-                # check that the start flag has been set
+                # check that the start flag has been set (i.e. done with initial wait, ok to go to position)
                 if self.start_flag:
                     # check if it is the first time in this state
                     if wait_counter == 0:
                         # get the start time
                         self.start_time = utime.ticks_ms()
-                        # increment the wait counter
-                        wait_counter += 1
+                    # set the setpoint in the proportional controller
+                    self.pcontrol.set_setpoint(self.setpoint)
+                    # # run the proportional controller
+                    # self.pcontrol.run(MOTOR_CONTROL_INTERVAL,self.start_time)
+                    # run the proportional controller, store the actuation value for comparison
+                    pwm = self.pcontrol.run(MOTOR_CONTROL_INTERVAL,self.start_time)
+                    # increment the wait counter
+                    wait_counter += 1
+                    # # check if done rotating the turret
+                    # if wait_counter >= MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL:
+                    #     # turn off start flag so images no longer captured
+                    #     self.start_flag = 0
+                    #     # reset wait counter
+                    #     wait_counter = 0
+                    #     # next state is FIRE
+                    #     state = FIRE
                     # check if done rotating the turret
-                    if wait_counter >= MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL:
+                    if abs(pwm) < MOTOR_ACTUATION_THRESH:
+                        # done rotating, turn off image flag so no more images captured
+                        self.image_flag = 0
                         # reset wait counter
                         wait_counter = 0
                         # next state is FIRE
                         state = FIRE
-                    # set the setpoint in the proportional controller
-                    self.pcontrol.set_setpoint(self.setpoint)
-                    # run the proportional controller
-                    self.pcontrol.run(MOTOR_CONTROL_INTERVAL,self.start_time)
-                    # increment the wait counter
-                    wait_counter += 1
+                        # DEBUGGING, print how long it took to reach threshold
+                        print(f'Done with RUN state of rotate FSM.')
+                        print(f'Took {utime.ticks_diff(utime.ticks_ms(),self.start_time)}ms.')
+                        print(f'Final pwm value is {pwm}.')
             # FIRE state
             elif state == FIRE:
                 # check if is first time in this state
                 if wait_counter == 0:
                     # actuate servo to pull trigger
+                    print('Firing.')
                     self.servo.set_pulse_width(SERVO_PULLED_POS)
                     # increment wait counter
                     wait_counter += 1
                 # check if done waiting
                 elif wait_counter >= SERVO_WAIT_TIME // MOTOR_CONTROL_INTERVAL:
                     # reset servo to initial position
+                    print('Resetting servo.')
                     self.servo.set_pulse_width(SERVO_START_POS)
                     # reset wait counter
                     wait_counter = 0
                     # next state is RUN
                     state = RUN
-                    # turn off start flag
+                    # turn off start flag so doesn't fire again
                     self.start_flag = 0
                 # otherwise, wait for servo to move
                 else:
@@ -674,7 +598,7 @@ def main():
     # initialize the button task
     button_task = cotask.Task(button_gen_fun,
                               name="Button_Task",
-                              priority=0,                       # TODO
+                              priority=2,                       # TODO
                               period=BUTTON_TASK_INTERVAL,      # TODO
                               profile=True,
                               trace=False,
@@ -690,8 +614,8 @@ def main():
     # initialize the image task
     image_task = cotask.Task(image_gen_fun,
                              name="Image_Task",
-                             priority=2,                # TODO
-                             period=IMAGE_WAIT_TIME,    # TODO
+                             priority=0,                    # TODO
+                             period=IMAGE_TASK_INTERVAL,    # TODO
                              profile=True,
                              trace=False,
                              shares=None)
@@ -706,27 +630,37 @@ def main():
     # possible before the real-time scheduler is started
     gc.collect()
 
+    # indicate starting turret process
+    print('Starting turret process. Waiting for button press...')
     # attempt turret process
     try:
-        # get the active low start button object
-        button = turret.get_start_button()
-        # continuously check if the button is pressed
-        while not button.value():
-            pass
+        # # get the active low start button object
+        # button = turret.get_start_button()
+        # # continuously check if the button is pressed
+        # while not button.value():
+        #     pass
         # button has been pressed, run tasks
         while True:
             cotask.task_list.pri_sched()
 
     # caught the Ctrl+C (^C) signal
     except KeyboardInterrupt:
-        # turn off servo
-        turret.get_servo().zero()
         # turn motor off
         turret.get_motor().set_duty_cycle(0)
-        # turn builtin LED off
-        turret.get_led().low()
+        # turn off servo
+        turret.get_servo().zero()
+        # # turn builtin LED off
+        # turret.get_led().low()
         # indicate exitting main
         print(f'\nExitting main due to KeyboardInterrupt\n\n')
+
+    # DEBUGGING, print diagnositcs
+    print('Done with turret tasks, now printing diagnostics.')
+    # print image ASCII art
+    turret.get_camera().ascii_art(turret.get_prev_image())
+    # print the setpoint
+    print(f'Latest setpoint was {turret.get_setpoint()}')
+
 
 
 # This main code is run if this file is the main program but won't run if this
@@ -735,4 +669,3 @@ if __name__ == '__main__':
 
     main()
     
-
