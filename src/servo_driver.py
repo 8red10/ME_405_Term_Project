@@ -175,10 +175,13 @@ def test_servo():
     
     # test servo
     # pull the trigger 
+    print('Pulling trigger.')
     servo.set_pulse_width(1.65)
     # wait 2 seconds
+    print('Waiting 2 seconds.')
     utime.sleep_ms(2000)
     # initial position = trigger not pressed
+    print('Reseting servo position. Waiting for KeyboardInterrupt...')
     servo.set_pulse_width(2.0)
 
     # wait for KeyboardInterrupt before cleaning up and exitting
