@@ -335,7 +335,7 @@ def test_MLX_cam():
                     # l = len(line)
                     # print(f'num row = {i}, num cols = {l}')
                     print(line)
-                    i += 1
+                    # i += 1
             else:
                 camera.ascii_art(image)
             gc.collect()
