@@ -47,6 +47,7 @@
 '''
 
 # imports here
+from machine import I2C
 import pyb
 import utime
 import motor_driver
@@ -61,7 +62,7 @@ import task_share
 import gc
 
 # global constants
-ENCODER_COUNT_PER_REV   = 16384 # TODO
+ENCODER_COUNT_PER_REV   = 98218 #16384 # TODO
 MOTOR_CONTROL_INTERVAL  = 10        # milliseconds
 MOTOR_CONTROL_PERIOD    = 2000      # milliseconds
 MOTOR_CONTROL_POINTS    = MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL
@@ -79,8 +80,8 @@ IMAGE_WAIT_TIME         = 50        # milliseconds
 SERVO_WAIT_TIME         = 2000      # milliseconds
 
 # global geometric placement variables
-PERP_DIST_CAMERA_TO_TARGET      = 8     # feet
-PERP_DIST_TURRET_TO_TARGET      = 14    # feet
+PERP_DIST_CAMERA_TO_TARGET      = 9 #8     # feet
+PERP_DIST_TURRET_TO_TARGET      = 17 #14    # feet
 CAMERA_FOV_ANGLE                = 55    # degrees
 
 # turret button FSM states
@@ -114,7 +115,7 @@ class turret_gen_class:
         motor to rotate the turret on pins PC1, PA0, PA1, timer 5. Initializes 
         the encoder reader on pins PC6, PC7, timer 8. Initializes the proportional 
         controller with this motor driver and this encoder reader. Initializes 
-        the mlx camera on I2C bus 2 which is pins PB10 and PB11. Initializes the 
+        the mlx camera on I2C bus 1 which is pins PB8 and PB9. Initializes the 
         servo on pin PB3, timer 2 to have a 20ms period and in its initial 
         position.
         @param      task_name -> String representing the name of this task.
@@ -142,7 +143,7 @@ class turret_gen_class:
         self.encoder = encoder_reader.Encoder(
             pyb.Pin.board.PC6,
             pyb.Pin.board.PC7,
-            timer=8)
+            timer_num=8)
         self.encoder.zero()
         # initialize proportional controller
         self.pcontrol = proportional_controller.ProportionalController(
@@ -154,7 +155,7 @@ class turret_gen_class:
             sense=self.encoder.read,
             data_points=MOTOR_CONTROL_POINTS)
         # initialize mlx camera
-        self.camera = mlx_cam.MLX_Cam(i2c=pyb.I2C(2))
+        self.camera = mlx_cam.MLX_Cam(i2c=I2C(1))
         self.camera._camera.refresh_rate = 10.0
         # initialize servo
         self.servo = servo_driver.ServoDriver(
@@ -665,11 +666,11 @@ def main():
     # initialize the turret object
     turret = turret_gen_class('Turret 1')
     # initialize the turret's button generator function
-    button_gen_fun = turret.button_task_gen_fun()
+    button_gen_fun = turret.button_task_gen_fun
     # initialize the turret's rotate generator function
-    rotate_gen_fun = turret.rotate_task_gen_fun()
+    rotate_gen_fun = turret.rotate_task_gen_fun
     # initialize the turret's image generator function
-    image_gen_fun = turret.image_task_gen_fun()
+    image_gen_fun = turret.image_task_gen_fun
     # initialize the button task
     button_task = cotask.Task(button_gen_fun,
                               name="Button_Task",
