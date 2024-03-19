@@ -12,9 +12,7 @@ California Polytechnic State University
 March 18, 2024
 
 ## Description
-Making a heat-sensing nerf turret.
-
-
+Making a heat-sensing nerf turret. TODO
 
 
 
@@ -51,19 +49,6 @@ Pitch Standoffs
 * 3x Stainless Steel Pan Head Slotted M4 x 12 mm Long x 0.7 mm 
 Pitch Screws
 * 3x Stainless Steel Hex M4 x 0.7 mm Pitch Nuts
-
-
-### Completed Design
-These next images illustrate the final product in action.
-
-![final design back view](./src/images/final_design_back.jpg)
-
-Figure 1. Back view of the final design in action. 
-
-
-![final design front view](./src/images/final_design_front.jpg)
-
-Figure 2. Front view of the final design in action. 
 
 
 ### CAD Model Description:
@@ -145,7 +130,7 @@ friction at that point.
 
 ### Electrical Schematics
 
-
+schematics. TODO
 
 
 ### Assembly Issues:
@@ -197,6 +182,33 @@ the axis of rotation to the center of gravity.
 of the inductance to the load on the turret motor.
 
 
+### Completed Design
+These next images illustrate the final product in action.
+
+![final design back view](./src/images/final_design_back.jpg)
+
+Figure 1. Back view of the final design in action. 
+
+
+![final design front view](./src/images/final_design_front.jpg)
+
+Figure 2. Front view of the final design in action. 
+
+
+## Software Design
+
+Overview of software design. TODO
+[Link to Doxygen pages and documentation](google.com)
+
+
+## Discussion of Results
+
+discuss. TODO
+
+
+## Discussion of Learnings and Recommentations 
+
+discuss. TODO
 
 
 ## License 
