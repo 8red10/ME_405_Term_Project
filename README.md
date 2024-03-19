@@ -53,6 +53,19 @@ Pitch Screws
 * 3x Stainless Steel Hex M4 x 0.7 mm Pitch Nuts
 
 
+### Completed Design
+These next images illustrate the final product in action.
+
+![final design back view](./src/images/final_design_back.jpg)
+
+Figure 1. Back view of the final design in action. 
+
+
+![final design front view](./src/images/final_design_front.jpg)
+
+Figure 2. Front view of the final design in action. 
+
+
 ### CAD Model Description:
 This section the idea behind the design of the main body and 
 associated components.
@@ -60,7 +73,7 @@ associated components.
 
 ![main rotating shaft](./src/images/Shaft1.PNG)
 
-Figure 1. When designing the Foam Dart Blaster Turret we centralized 
+Figure 3. When designing the Foam Dart Blaster Turret we centralized 
 it around its main axle of rotaion. This rotation would be from the 
 96 teeth gear. To support this design, the central shaft was 
 designed to connect to the 6 inner gaps, as seen below.
@@ -68,7 +81,7 @@ designed to connect to the 6 inner gaps, as seen below.
 
 ![main frame](./src/images/MainFrame2.PNG)
 
-Figure 2. In order to power the 96 teeth gear, it needed to connect 
+Figure 4. In order to power the 96 teeth gear, it needed to connect 
 to the chosen motor of this project: the Ametek-Pittman DC Encoder 
 Motor. The motor drives a 16 teeth gear that is the same module 
 number as the 96 teeth gear. To ensure constant contact between 
@@ -78,13 +91,13 @@ mind when designing the bottom frame of the Foam Dart Blaster Turret.
 
 ![motor holder](./src/images/MotorHolder1.PNG)
 
-Figure 3. The bottom frame also accounted for the distance gained from 
+Figure 5. The bottom frame also accounted for the distance gained from 
 the motor holder component.
 
 
 ![top plate](./src/images/TopPlate1.PNG)
 
-Figure 4. In order to prevent the 96 teeth gear from experiencing any 
+Figure 6. In order to prevent the 96 teeth gear from experiencing any 
 excessive friction, a lazy susan was incorporated into the design. This 
 meant that the majority of the vertical weight from the rotating portion 
 of the Foam Dart Blaster Turret could be displaced into the walls of the 
@@ -94,7 +107,7 @@ plate was made to connect the two components together.
 
 ![nerf gun holder](./src/images/NerfGunHolder1.PNG)
 
-Figure 5. The main turret was designed to connect to two components; the 
+Figure 7. The main turret was designed to connect to two components; the 
 lazy susan and the central shaft. This way it would recieve the torque 
 from the shaft and displace its weight into the frame. Alongside 
 connecting to those components, the main turret was designed to hold the 
@@ -105,13 +118,13 @@ shoot.
 
 ![full assembly](./src/images/Assembly1.PNG)
 
-Figure 6. Below is the full CAD assembly of the Foam Dart Blaster Turret 
+Figure 8. Below is the full CAD assembly of the Foam Dart Blaster Turret 
 from the previusly mentioned components. 
 
 
 ![assembly connected with main shaft](./src/images/Assembly2.PNG)
 
-Figure 7. To understand how the Foam Dart Blaster Turret better works, it 
+Figure 9. To understand how the Foam Dart Blaster Turret better works, it 
 can be viewed at two section analysis views. In this first one below, the 
 main turret can be seen being connected to the central shaft and the central 
 shaft being connected to the 96 teeth gear (of which is represented by a 
@@ -120,7 +133,7 @@ simplified model in the assembly).
 
 ![assembly sectional analysis view](./src/images/Assembly3.PNG)
 
-Figure 8. In this next section analysis view, a clearer image of how the 
+Figure 10. In this next section analysis view, a clearer image of how the 
 central shaft operates is shown. While the 96 teeth gear rotates around 
 the bottom frame shaft, the torque it generates is transferred upward to 
 the main turret through the mediated connection with the central shaft. 
@@ -136,14 +149,30 @@ friction at that point.
 
 
 ### Assembly Issues:
+Once the CAD models were 3D printed, assembly began. However, a series of 
+problems became apparent. 
 
-Once the CAD models were 3D printed, assembly began. However, a series of problems became apparent. 
 
-Firstly, the central shaft was too thick as the size of the DC motor was not taken into account when modeling. Due to lack of time to print an updated design, the central shaft (and connected main turret shaft portion) were sanded down in Mustang60 using a vetical belt wood sander. However, due to the heat from sanding, the plastic of the 3D print began to melt. So instead of simply grinding down the plastic, the melted layer of plastic was pushed to the ends of the shaft (mostly towards the main turret end). This provided a small benefit in fusing the central shaft to the main turret together. In the end, the central shaft was able to be "sanded" down in size to allow clearance for the DC motor.
-(insert image of melted plastic at base of main turret)
+![melted plastic of main shaft](./src/images/meltedshaft.jpg)
 
-Secondly, the portion of the main turret that housed the servo motor had walls that were too long. Specifically, the servo motor could not fit in due to there being no room for the wires to pass through. To remedy this, the back wall was cut down in size.
-(insert image of servo motor holder)
+Figure 9. Firstly, the central shaft was too thick as the size of the DC 
+motor was not taken into account when modeling. Due to lack of time to 
+print an updated design, the central shaft (and connected main turret 
+shaft portion) were sanded down in Mustang60 using a vetical belt wood 
+sander. However, due to the heat from sanding, the plastic of the 3D 
+print began to melt. So instead of simply grinding down the plastic, the 
+melted layer of plastic was pushed to the ends of the shaft (mostly 
+towards the main turret end). This provided a small benefit in fusing the 
+central shaft to the main turret together. In the end, the central shaft 
+was able to be "sanded" down in size to allow clearance for the DC motor.
+
+
+![servo motor holder](./src/images/sawedservomotorholder.jpg)
+
+Figure 10. Secondly, the portion of the main turret that housed the servo 
+motor had walls that were too long. Specifically, the servo motor could not 
+fit in due to there being no room for the wires to pass through. To remedy 
+this, the back wall was cut down in size.
 
 
 ### Electromechanical Properties
@@ -166,6 +195,8 @@ Table 1. Characteristics of the motor used in our project.
 the axis of rotation to the center of gravity.
 * Assumed a near zero inductance due to the insignificance 
 of the inductance to the load on the turret motor.
+
+
 
 
 ## License 
