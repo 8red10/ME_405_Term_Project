@@ -1,11 +1,15 @@
 # ME 405 Term Project
 
 ## Authors
-by: Jack Krammer and Jason Chang
+Jack Krammer and Jason Chang
+
+Professors: 
+* Ridgely, John R.
+* Refvem, Charlie Thomas
 
 California Polytechnic State University
 
-March 15, 2024
+March 18, 2024
 
 ## Description
 Making a heat-sensing nerf turret.
@@ -97,4 +101,6 @@ Secondly, the portion of the main turret that housed the servo motor had walls t
 
 
 
+## License 
+copyright (c) 2024 by mecha04 and released under MIT License
 
