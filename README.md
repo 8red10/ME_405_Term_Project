@@ -3,7 +3,7 @@
 ## Authors
 Jack Krammer and Jason Chang
 
-Professors: 
+Assisting professors: 
 * Ridgely, John R.
 * Refvem, Charlie Thomas
 
@@ -15,31 +15,17 @@ March 18, 2024
 Making a heat-sensing nerf turret.
 
 
-## Electromechanical Properties
 
-| Motor Parameter | Value | Unit | 
-|:---------------:|:-----:|:----:|
-| Total Rotating Mass | 0.407 | $kg$ |
-| Length to Center of Gravity | 0.050 | $m$ |
-| Mass Moment of Inertia | 1.125e-3 | $I$ |
-| Viscous Damping Coefficient | 3.14e-7 | $b$ |
-| Torque Constant | 0.0282 | $K_t$ |
-| Back-emf Constant | 0.0282 | $K_v$ |
-| Terminal Resistance | 35.0 | $\Omega$ |
-| Terminal Inductance | 1.00e-5$*$| $H$ | 
-| Motor DC Voltage | 12 | $V$ |
-
-Table 1. Characteristics of the motor used in our project.
-
-* Length to Center of Gravity is measured from the origin of 
-the axis of rotation to the center of gravity.
-* Assumed a near zero inductance due to the insignificance 
-of the inductance to the load on the turret motor.
 
 
 ## Hardware Design
+This section identifies key components in the hardware design 
+of this project.
 
-### Micropython Board and Electronics:
+### Materials
+The materials used to build this project.
+
+#### Micropython Board and Electronics:
 * 1x l6206 Motor Driver "Shield"
 * 1x STM32L476RG Nucleo Arduino
 * 1x The Shoe of Brian
@@ -49,24 +35,36 @@ of the inductance to the load on the turret motor.
 * 1x 0.33 uf Hilitchi Chip Capacitor
 * 1x Voltage Regulator
 
-### Pre-fabricated Components:
+#### Pre-fabricated Components:
 * 1x Fortnite Nerf Flare Dart Blaster
 * 1x Ametek-Pittman PG6712A077-R3 6665 DC Encoder Motor
 * 1x 1501MG RC Servo Motor
 * 1x 96 teeth 0.5 Module Gear
 * 1x 6 in x 6 in Lazy Susan Hardware
 * 1x 1 ft Long Shoe String
-* 6x Stainless Steel Pan Head Slotted M3 x 25 mm Long x 0.5 mm Pitch Screws
-* 2x Stainless Steel Female Threaded Hex M3 x 8 mm Long x 0.5 mm Pitch Standoffs
+* 6x Stainless Steel Pan Head Slotted M3 x 25 mm Long x 0.5 mm 
+Pitch Screws
+* 2x Stainless Steel Female Threaded Hex M3 x 8 mm Long x 0.5 mm 
+Pitch Standoffs
 * 4x Zinc Plated #8 x 1/2 in Machine Bolts
 * 4x #8 Hex Nuts
-* 3x Stainless Steel Pan Head Slotted M4 x 12 mm Long x 0.7 mm Pitch Screws
+* 3x Stainless Steel Pan Head Slotted M4 x 12 mm Long x 0.7 mm 
+Pitch Screws
 * 3x Stainless Steel Hex M4 x 0.7 mm Pitch Nuts
 
+
 ### CAD Model Description:
-When designing the Foam Dart Blaster Turret we centralized it around its main axle of rotaion. This rotation would be from the 96 teeth gear. To support this design, the central shaft was designed to connect to the 6 inner gaps, as seen below.
-(insert image of Shaft1.PNG)
-![]()
+This section the idea behind the design of the main body and 
+associated components.
+
+
+
+![main rotating shaft](./src/images/Shaft1.PNG)
+Figure 1. When designing the Foam Dart Blaster Turret we centralized 
+it around its main axle of rotaion. This rotation would be from the 
+96 teeth gear. To support this design, the central shaft was 
+designed to connect to the 6 inner gaps, as seen below.
+
 	
 In order to power the 96 teeth gear, it needed to connect to the chosen motor of this project: the Ametek-Pittman DC Encoder Motor. The motor drives a 16 teeth gear that is the same module number as the 96 teeth gear. To ensure constant contact between these two gears, the required distance between the two was kept in mind when designing the bottom frame of the Foam Dart Blaster Turret. 
 (insert image of MainFrame2.PNG)
@@ -89,6 +87,9 @@ To understand how the Foam Dart Blaster Turret better works, it can be viewed at
 In this next section analysis view, a clearer image of how the central shaft operates is shown. While the 96 teeth gear rotates around the bottom frame shaft, the torque it generates is transferred upward to the main turret through the mediated connection with the central shaft. Also seen is the small gab between the central shaft and the 96 teeth gear. This shows that if fitted properly, no downward force will be place onto the 96 teeth gear (other than its own weight), preventing any excessive friction at that point. 
 (insert image of Assembly3.PNG)
 
+### Electrical Schematics
+
+
 ### Assembly Issues:
 
 Once the CAD models were 3D printed, assembly began. However, a series of problems became apparent. 
@@ -99,6 +100,27 @@ Firstly, the central shaft was too thick as the size of the DC motor was not tak
 Secondly, the portion of the main turret that housed the servo motor had walls that were too long. Specifically, the servo motor could not fit in due to there being no room for the wires to pass through. To remedy this, the back wall was cut down in size.
 (insert image of servo motor holder)
 
+
+### Electromechanical Properties
+
+| Motor Parameter | Value | Unit | 
+|:---------------:|:-----:|:----:|
+| Total Rotating Mass | 0.407 | $kg$ |
+| Length to Center of Gravity | 0.050 | $m$ |
+| Mass Moment of Inertia | 1.125e-3 | $I$ |
+| Viscous Damping Coefficient | 3.14e-7 | $b$ |
+| Torque Constant | 0.0282 | $K_t$ |
+| Back-emf Constant | 0.0282 | $K_v$ |
+| Terminal Resistance | 35.0 | $\Omega$ |
+| Terminal Inductance | 1.00e-5$*$| $H$ | 
+| Motor DC Voltage | 12 | $V$ |
+
+Table 1. Characteristics of the motor used in our project.
+
+* Length to Center of Gravity is measured from the origin of 
+the axis of rotation to the center of gravity.
+* Assumed a near zero inductance due to the insignificance 
+of the inductance to the load on the turret motor.
 
 
 ## License 
