@@ -42,7 +42,7 @@
 
                             
 @authors    Jack Krammer and Jason Chang
-@date       12-Mar-2024
+@date       18-Mar-2024
 @copyright (c) 2024 by mecha04 and released under MIT License
 '''
 
@@ -62,12 +62,11 @@ import task_share
 import gc
 
 # global constants
-ENCODER_COUNT_PER_REV   = 98218 #16384 # TODO
+ENCODER_COUNT_PER_REV   = 98218
 MOTOR_CONTROL_INTERVAL  = 20        # milliseconds
 MOTOR_CONTROL_PERIOD    = 2000      # milliseconds
 MOTOR_CONTROL_POINTS    = MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL
-MOTOR_ACTUATION_THRESH  = 15        # duty cycle (%)      # TODO
-# ROTATE_POS_THRESH       = 100       # encoder counts    # TODO
+MOTOR_ACTUATION_THRESH  = 15        # duty cycle (%)
 THERMAL_LIMITS          = (0,100)
 BUTTON_TASK_INTERVAL    = 10        # milliseconds
 IMAGE_TASK_INTERVAL     = 160       # milliseconds
@@ -76,7 +75,6 @@ SERVO_PULLED_POS        = 1.35       # pulse width (milliseconds)
 
 # global wait time constants
 WAIT_TIME               = 5000      # milliseconds
-# IMAGE_WAIT_TIME         = 50        # milliseconds
 SERVO_WAIT_TIME         = 2000      # milliseconds
 
 # global geometric placement variables
@@ -410,7 +408,7 @@ class turret_gen_class:
                     self.image_flag = 1
                     # set start flag
                     self.start_flag = 1
-                    # turn LED off to show done waiting, for debugging # TODO
+                    # turn LED off to show done waiting, for debugging
                     self.led.low()
                     # reset wait_counter
                     wait_counter = 0
@@ -428,7 +426,6 @@ class turret_gen_class:
             else:
                 raise ValueError(f'Incorrect state for button task. Value was {state}.')
         # end while
-        # TODO
         
     def image_task_gen_fun(self):
         '''!
@@ -463,23 +460,6 @@ class turret_gen_class:
                         state = PARSE
             # PARSE state
             elif state == PARSE:
-                # # check if is first time in this state
-                # if wait_counter == 0:
-                #     # derive setpoint from image data
-                #     self.setpoint = self.parse_image(self.camera,self.image)
-                #     # increment the wait counter
-                #     wait_counter += 1
-                # # check if done waiting for motor to rotate, and is time to get another image
-                # elif wait_counter >= MOTOR_CONTROL_PERIOD // IMAGE_TASK_INTERVAL:
-                #     # reset wait counter
-                #     wait_counter = 0
-                #     # next state is CAPTURE
-                #     state = CAPTURE
-                # # otherwise, have already set the setpoint for this image
-                # else:
-                #     # increment wait counter
-                #     wait_counter += 1
-
                 # derive setpoint from image data
                 print('Parsing image.')
                 self.setpoint = self.parse_image(self.camera, self.image)
@@ -495,7 +475,6 @@ class turret_gen_class:
             else:
                 raise ValueError(f'Incorrect state for image task. Value was {state}.')
         # end while
-        # TODO
     
     def rotate_task_gen_fun(self):
         '''!
@@ -530,14 +509,6 @@ class turret_gen_class:
                     pwm = self.pcontrol.run(MOTOR_CONTROL_INTERVAL,self.start_time)
                     # increment the wait counter
                     wait_counter += 1
-                    # # check if done rotating the turret
-                    # if wait_counter >= MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL:
-                    #     # turn off start flag so images no longer captured
-                    #     self.start_flag = 0
-                    #     # reset wait counter
-                    #     wait_counter = 0
-                    #     # next state is FIRE
-                    #     state = FIRE
                     # check if done rotating the turret
                     if abs(pwm) < MOTOR_ACTUATION_THRESH:
                         # done rotating, turn off image flag so no more images captured
@@ -578,7 +549,6 @@ class turret_gen_class:
             else:
                 raise ValueError(f'Incorrect state value for rotate task. Value was {state}.')
         # end while
-        # TODO
 
 def main():
     '''!
@@ -634,12 +604,6 @@ def main():
     print('Starting turret process. Waiting for button press...')
     # attempt turret process
     try:
-        # # get the active low start button object
-        # button = turret.get_start_button()
-        # # continuously check if the button is pressed
-        # while not button.value():
-        #     pass
-        # button has been pressed, run tasks
         while True:
             cotask.task_list.pri_sched()
 
@@ -649,8 +613,6 @@ def main():
         turret.get_motor().set_duty_cycle(0)
         # turn off servo
         turret.get_servo().zero()
-        # # turn builtin LED off
-        # turret.get_led().low()
         # indicate exitting main
         print(f'\nExitting main due to KeyboardInterrupt\n\n')
 
@@ -660,7 +622,6 @@ def main():
     turret.get_camera().ascii_art(turret.get_prev_image())
     # print the setpoint
     print(f'Latest setpoint was {turret.get_setpoint()}')
-
 
 
 # This main code is run if this file is the main program but won't run if this
