@@ -58,36 +58,81 @@ This section the idea behind the design of the main body and
 associated components.
 
 
-
 ![main rotating shaft](./src/images/Shaft1.PNG)
+
 Figure 1. When designing the Foam Dart Blaster Turret we centralized 
 it around its main axle of rotaion. This rotation would be from the 
 96 teeth gear. To support this design, the central shaft was 
 designed to connect to the 6 inner gaps, as seen below.
 
-	
-In order to power the 96 teeth gear, it needed to connect to the chosen motor of this project: the Ametek-Pittman DC Encoder Motor. The motor drives a 16 teeth gear that is the same module number as the 96 teeth gear. To ensure constant contact between these two gears, the required distance between the two was kept in mind when designing the bottom frame of the Foam Dart Blaster Turret. 
-(insert image of MainFrame2.PNG)
 
-The bottom frame also accounted for the distance gained from the motor holder component.
-(insert image of MotorHolder1.PNG)
+![main frame](./src/images/MainFrame2.PNG)
 
-In order to prevent the 96 teeth gear from experiencing any excessive friction, a lazy susan was incorporated into the design. This meant that the majority of the vertical weight from the rotating portion of the Foam Dart Blaster Turret could be displaced into the walls of the bottom frame instead. To secure the lazy susan to the bottom frame, a plate was made to connect the two components together. 
-(insert image of TopPlate1.PNG)
+Figure 2. In order to power the 96 teeth gear, it needed to connect 
+to the chosen motor of this project: the Ametek-Pittman DC Encoder 
+Motor. The motor drives a 16 teeth gear that is the same module 
+number as the 96 teeth gear. To ensure constant contact between 
+these two gears, the required distance between the two was kept in 
+mind when designing the bottom frame of the Foam Dart Blaster Turret. 
 
-The main turret was designed to connect to two components; the lazy susan and the central shaft. This way it would recieve the torque from the shaft and displace its weight into the frame. Alongside connecting to those components, the main turret was designed to hold the chosen Foam Dart Blaster (Fortnite Nerf Flare Dart Blaster) and a servo motor near the trigger of the Nerf Gun to allow control over when it would shoot.
-(insert image of NerfGunHolder1.PNG)
 
-Below is the full CAD assembly of the Foam Dart Blaster Turret from the previusly mentioned components. 
-(insert image of Assembly1.PNG)
+![motor holder](./src/images/MotorHolder1.PNG)
 
-To understand how the Foam Dart Blaster Turret better works, it can be viewed at two section analysis views. In this first one below, the main turret can be seen being connected to the central shaft and the central shaft being connected to the 96 teeth gear (of which is represented by a simplified model in the assembly). 
-(insert image of Assembly2.PNG)
+Figure 3. The bottom frame also accounted for the distance gained from 
+the motor holder component.
 
-In this next section analysis view, a clearer image of how the central shaft operates is shown. While the 96 teeth gear rotates around the bottom frame shaft, the torque it generates is transferred upward to the main turret through the mediated connection with the central shaft. Also seen is the small gab between the central shaft and the 96 teeth gear. This shows that if fitted properly, no downward force will be place onto the 96 teeth gear (other than its own weight), preventing any excessive friction at that point. 
-(insert image of Assembly3.PNG)
+
+![top plate](./src/images/TopPlate1.PNG)
+
+Figure 4. In order to prevent the 96 teeth gear from experiencing any 
+excessive friction, a lazy susan was incorporated into the design. This 
+meant that the majority of the vertical weight from the rotating portion 
+of the Foam Dart Blaster Turret could be displaced into the walls of the 
+bottom frame instead. To secure the lazy susan to the bottom frame, a 
+plate was made to connect the two components together. 
+
+
+![nerf gun holder](./src/images/NerfGunHolder1.PNG)
+
+Figure 5. The main turret was designed to connect to two components; the 
+lazy susan and the central shaft. This way it would recieve the torque 
+from the shaft and displace its weight into the frame. Alongside 
+connecting to those components, the main turret was designed to hold the 
+chosen Foam Dart Blaster (Fortnite Nerf Flare Dart Blaster) and a servo 
+motor near the trigger of the Nerf Gun to allow control over when it would 
+shoot.
+
+
+![full assembly](./src/images/Assembly1.PNG)
+
+Figure 6. Below is the full CAD assembly of the Foam Dart Blaster Turret 
+from the previusly mentioned components. 
+
+
+![assembly connected with main shaft](./src/images/Assembly2.PNG)
+
+Figure 7. To understand how the Foam Dart Blaster Turret better works, it 
+can be viewed at two section analysis views. In this first one below, the 
+main turret can be seen being connected to the central shaft and the central 
+shaft being connected to the 96 teeth gear (of which is represented by a 
+simplified model in the assembly). 
+
+
+![assembly sectional analysis view](./src/images/Assembly3.PNG)
+
+Figure 8. In this next section analysis view, a clearer image of how the 
+central shaft operates is shown. While the 96 teeth gear rotates around 
+the bottom frame shaft, the torque it generates is transferred upward to 
+the main turret through the mediated connection with the central shaft. 
+Also seen is the small gab between the central shaft and the 96 teeth gear. 
+This shows that if fitted properly, no downward force will be place onto 
+the 96 teeth gear (other than its own weight), preventing any excessive 
+friction at that point. 
+
 
 ### Electrical Schematics
+
+
 
 
 ### Assembly Issues:
