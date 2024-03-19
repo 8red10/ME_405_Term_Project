@@ -1,47 +1,41 @@
-## ME 405 Term Project
+# ME 405 Term Project
 
-### Authors
+## Authors
 by: Jack Krammer and Jason Chang
 
 California Polytechnic State University
 
 March 15, 2024
 
-### Description
+## Description
 Making a heat-sensing nerf turret.
 
 
-### Electromechanical Properties / Geometric Turret Parameters
+## Electromechanical Properties
 
 | Motor Parameter | Value | Unit | 
 |:---------------:|:-----:|:----:|
 | Total Rotating Mass | 0.407 | $kg$ |
-| Length to Center of Gravity | 0.05 | $m$ |
+| Length to Center of Gravity | 0.050 | $m$ |
 | Mass Moment of Inertia | 1.125e-3 | $I$ |
 | Viscous Damping Coefficient | 3.14e-7 | $b$ |
 | Torque Constant | 0.0282 | $K_t$ |
-
-| Terminal Resistance | 53.2 | $\Omega$ |
-| Terminal Inductance | 0.125$*$| $H$ | 
+| Back-emf Constant | 0.0282 | $K_v$ |
+| Terminal Resistance | 35.0 | $\Omega$ |
+| Terminal Inductance | 1.00e-5$*$| $H$ | 
+| Motor DC Voltage | 12 | $V$ |
 
 Table 1. Characteristics of the motor used in our project.
 
-* Length to center of gravity is measured from the origin of 
+* Length to Center of Gravity is measured from the origin of 
 the axis of rotation to the center of gravity.
 * Assumed a near zero inductance due to the insignificance 
 of the inductance to the load on the turret motor.
 
-| Mass Parameter | Value | Unit | 
-|:--------------:|:-----:|:----:|
-| Total Rotating Mass | 0.407 | $kg$ | 
-| Total Mass | | $kg$ | 
 
-Table 2. Related mass values of the turret.
+## Hardware Design
 
-
-### Hardware Design
-
-#### Micropython Board and Electronics:
+### Micropython Board and Electronics:
 * 1x l6206 Motor Driver "Shield"
 * 1x STM32L476RG Nucleo Arduino
 * 1x The Shoe of Brian
@@ -51,7 +45,7 @@ Table 2. Related mass values of the turret.
 * 1x 0.33 uf Hilitchi Chip Capacitor
 * 1x Voltage Regulator
 
-#### Pre-fabricated Components:
+### Pre-fabricated Components:
 * 1x Fortnite Nerf Flare Dart Blaster
 * 1x Ametek-Pittman PG6712A077-R3 6665 DC Encoder Motor
 * 1x 1501MG RC Servo Motor
@@ -65,7 +59,7 @@ Table 2. Related mass values of the turret.
 * 3x Stainless Steel Pan Head Slotted M4 x 12 mm Long x 0.7 mm Pitch Screws
 * 3x Stainless Steel Hex M4 x 0.7 mm Pitch Nuts
 
-#### CAD Model Description:
+### CAD Model Description:
 When designing the Foam Dart Blaster Turret we centralized it around its main axle of rotaion. This rotation would be from the 96 teeth gear. To support this design, the central shaft was designed to connect to the 6 inner gaps, as seen below.
 (insert image of Shaft1.PNG)
 ![]()
@@ -91,7 +85,7 @@ To understand how the Foam Dart Blaster Turret better works, it can be viewed at
 In this next section analysis view, a clearer image of how the central shaft operates is shown. While the 96 teeth gear rotates around the bottom frame shaft, the torque it generates is transferred upward to the main turret through the mediated connection with the central shaft. Also seen is the small gab between the central shaft and the 96 teeth gear. This shows that if fitted properly, no downward force will be place onto the 96 teeth gear (other than its own weight), preventing any excessive friction at that point. 
 (insert image of Assembly3.PNG)
 
-#### Assembly Issues:
+### Assembly Issues:
 
 Once the CAD models were 3D printed, assembly began. However, a series of problems became apparent. 
 
