@@ -56,7 +56,7 @@ This section the idea behind the design of the main body and
 associated components.
 
 
-![main rotating shaft](./src/images/Shaft1.PNG)
+![main rotating shaft](./src/images/Shaft1.PNG =x100)
 
 Figure 3. When designing the Foam Dart Blaster Turret we centralized 
 it around its main axle of rotaion. This rotation would be from the 
