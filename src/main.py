@@ -15,24 +15,24 @@
             rotate task will stop running the proportional controller and 
             will actuate the servo to pull the trigger on the nerf gun.
             While this code multitasks, it does not have the funcitonality 
-            to fire multiple bullets, i.e. at multiple targets. \n
+            to fire multiple bullets, i.e. at multiple targets. \n\n
 
             Push button connection:\n
             Signal          = PC2\n
             VDD             = 3V3\n
-            Ground          = GND\n
+            Ground          = GND\n\n
 
             Servo connection:\n
             Signal          = PB3\n
             VDD             = look at schematic\n
-            Ground          = look at schematic\n
+            Ground          = look at schematic\n\n
 
             Camera qwiic connection:\n
             Black wire      = ground\n
             Red wire        = 3V3\n
             Blue wire       = SDA (I2C bus 1 = PB9; I2C bus 2 = PB11)\n
             Yellow wire     = SCL (I2C bus 1 = PB8; I2C bus 2 = PB10)\n
-            The I2C bus 1 is used in for this project\n
+            The I2C bus 1 is used in for this project\n\n
 
             Motor and encoder connection:\n
             Blue wire	    = PC7, Encoder channel B\n
@@ -40,10 +40,10 @@
             Red	wire        = 3V3, Encoder 5V supply (should be connected to the 3.3V output)\n
             Black wire	    = GND, Encoder ground\n
             Orange wire	    = B+ of L6206 H-bridge, Motor power\n
-            Green wire	    = B- of L6206 H-bridge, Motor power\n
+            Green wire	    = B- of L6206 H-bridge, Motor power\n\n
 
             Builtin LED configuration:\n
-            Output          = LD2 (builtin)\n
+            Output          = LD2 (builtin)\n\n
 
                             
 @authors    Jack Krammer and Jason Chang
