@@ -26,3 +26,11 @@ afterwards. For further clarification upon project and Dueling Day rules, you ma
 to Dr. John Ridgely's provided HTML file below.
 <a href="./src/links/termproj_W24.html" title="term_proj_specs">Term Project Specifications</a>
 
+
+## Dependencies
+This project depends on a couple of MicroPython files as well as a couple professor 
+created or adapted files. The MicroPython 
+<a href="https://docs.micropython.org/en/latest/library/pyb.html" title="pyb">pyb</a>,
+<a href="https://docs.micropython.org/en/latest/library/machine.I2C.html" title="machine I2C">machine I2C</a>,
+and 
+<a href="https://docs.micropython.org/en/v1.15/library/utime.html" title="uitme">utime</a>
