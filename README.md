@@ -42,6 +42,9 @@ and
 with some associated documentation found 
 <a href="https://spluttflob.github.io/ME405-Support/" title="ME 405 documentatin">here</a>.
 
+More documenation and diagrams describing the software for this project can be found
+<a href="https://8red10.github.io/ME_405_Term_Project/" title="project documentation">here</a>.
+
 
 ## Hardware Design
 This section identifies key components in the hardware design of this project.
