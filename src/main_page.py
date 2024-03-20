@@ -66,7 +66,7 @@ Figure 1. This figure illustrates the task diagram for the turret process.
 
 @b Rotate @b Task
 
-<img src='./../src/images/rotate_state_diagram.png' alt='rotate state diagram' height='300'>
+<img src='rotate_state_diagram.png' alt='rotate state diagram' height='300'>
 
 Figure 2. This figure illustrates the state diagram for the @b rotate @b task
 of the turret process.
@@ -74,7 +74,7 @@ of the turret process.
 
 @b Image @b Task
 
-<img src='./../src/images/image_state_diagram.png' alt='image state diagram' height='300'>
+<img src='image_state_diagram.png' alt='image state diagram' height='300'>
 
 Figure 3. This figure illustrates the state diagram for the @b image @b task
 of the turret process
@@ -82,7 +82,7 @@ of the turret process
 
 @b Button @b Task
 
-<img src='./../src/images/button_state_diagram.png' alt='button state diagram' height='300'>
+<img src='button_state_diagram.png' alt='button state diagram' height='300'>
 
 Figure 4. This figure illustrates the state diagram for the @b button @b task
 of the turret process
@@ -97,7 +97,7 @@ used for this project.
 
 @subsection ssec2_0 Button Schematic
 
-<img src='./../src/images/button_schematic.png' alt='button schematic' height='300'>
+<img src='button_schematic.png' alt='button schematic' height='300'>
 
 Figure 5. This figure illustrates the electrical schematic designed to read
 an active low button to start the turret process. PC2 is the signal input 
@@ -107,7 +107,7 @@ to the microcontroller.
 
 @subsection ssec2_1 Servo Schematic
 
-<img src='./../src/images/servo_schematic.png' alt='servo schematic' height='300'>
+<img src='servo_schematic.png' alt='servo schematic' height='300'>
 
 Figure 5. This figure illustrates the electrical schematic designed to 
 convert 12V DV to ~6V with a 7805A JRC transistor to supply the servo 
