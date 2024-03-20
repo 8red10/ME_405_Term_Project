@@ -75,7 +75,7 @@ designed to connect to the 6 inner gaps, as seen below.
 
 
 <!-- ![main frame](./src/images/MainFrame2.PNG) -->
-<div align='center'><img src='./src/images/MainFrame2.PNG' alt='main frame' height='300'>
+<img src='./src/images/MainFrame2.PNG' alt='main frame' height='300'>
 
 Figure 4. In order to power the 96 teeth gear, it needed to connect 
 to the chosen motor of this project: the Ametek-Pittman DC Encoder 
