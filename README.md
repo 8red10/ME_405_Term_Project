@@ -26,6 +26,6 @@ afterwards. For further clarification upon project and Dueling Day rules, you ma
 to Dr. John Ridgely's provided HTML file below.
 (included link to termproj_W24.html in doc folder)
 [lllink]: ./src/links/termproj_W24.html 'term'
-[]: https://www.google.com
+[]: https://www.google.com 'goog'
 
 A brief discussion of what you've learned about the project and recommendations for anyone who would like to build upon your work. This does not mean a discussion of what you learned about mechatronics in general; that belongs in other places.  It is a discussion of what worked well and what didn't for this device.
