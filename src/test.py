@@ -1,7 +1,19 @@
 '''!
 @file test.py
+@brief      A file to help test files and aspects of the ME 405 Term 
+            Project.
 
-A file to help test other files and other code.
+@details    The functions and classes created in this file are not 
+            meant to be implemented outside of the scope of testing.
+            Some code is out of date compared to the final versions 
+            used in the other files of this /src directory. This file
+            helped increase the testability of specific components 
+            used in the final version of this project as the scope of
+            issues could be focused to determine the cause(s). When
+            this file is run as the main file, the current uncommented
+            test function will execute. When testing, only one was 
+            uncommented at a time to better test issues. Nonetheless,
+            many of these functions were useful for testing.
 
 @author     Jack Krammer
 @date       12-Mar-2024
@@ -25,7 +37,6 @@ MOTOR_CONTROL_INTERVAL  = 20        # milliseconds
 MOTOR_CONTROL_PERIOD    = 2000      # milliseconds
 MOTOR_CONTROL_POINTS    = MOTOR_CONTROL_PERIOD // MOTOR_CONTROL_INTERVAL
 ENCODER_COUNT_PER_REV   = 98218
-
 THERMAL_LIMITS          = (0,100)
 
 # global geometric placement variables
