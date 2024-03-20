@@ -59,6 +59,22 @@ information on the control of the turret.
 <img src='task_diagram.png' alt='task diagram' height='400'>
 
 Figure 1. This figure illustrates the task diagram for the turret process.
+The assigned priorities are based on the difference in time it takes for each 
+task to run. As the image task takes the longest, we didn't want it to block
+all other tasks, so we made it the lowest priority and with a frequency that 
+was tested to allow an image update almost every task run. As the frequency of 
+the rotate task function is also the frequency the proportional controller is 
+run, this frequency was not as flexible, but 50Hz was chosen to ensure 
+quality behavior without losing too much efficiency. For the button task, 
+this was set to the highest priority because if it did interrupt other tasks,
+it would be so short that there would be minimal exclusion. The button task
+also runs at the highest frequency to detect even extremely short button 
+presses. The `start_flag` and `image_flag` variables shared by the button task 
+enable the rotate task and image task, respectively. The shared 'setpoint' 
+variable is shared by the image task as the setpoint is derived from thermal 
+image data. The shared 'setpoint' variable is recieved by the rotate task as
+this is the value to run the proportional controller with. This sharing 
+optimizes cooperation and division of labor between tasks.
 \n\n
 
 
@@ -69,7 +85,11 @@ Figure 1. This figure illustrates the task diagram for the turret process.
 <img src='rotate_state_diagram.png' alt='rotate state diagram' height='300'>
 
 Figure 2. This figure illustrates the state diagram for the @b rotate @b task
-of the turret process.
+of the turret process. The `start_flag` variable ensures that the turret will
+not rotate unless the button task has allowed it to. The threshold is to 
+ensure that the turret is in the desired position before moving to the FIRE 
+state and pulling the trigger. After this FIRE state, the `start_flag` variable
+is reset so the turret won't shoot twice. 
 \n\n
 
 @b Image @b Task
@@ -77,7 +97,12 @@ of the turret process.
 <img src='image_state_diagram.png' alt='image state diagram' height='300'>
 
 Figure 3. This figure illustrates the state diagram for the @b image @b task
-of the turret process
+of the turret process. The `image_flag` variable ensures that the turret will
+not capture images until after the button has allowed it to. The `image` 
+variable check ensures that there is an image available to parse before 
+moving to the PARSE state. After this PARSE state, the `image_flag` variable
+is reset so the camera will not waste computational power capturing another 
+image after it already has one.
 \n\n
 
 @b Button @b Task
@@ -85,7 +110,14 @@ of the turret process
 <img src='button_state_diagram.png' alt='button state diagram' height='300'>
 
 Figure 4. This figure illustrates the state diagram for the @b button @b task
-of the turret process
+of the turret process. The `SW1` variable represents the start button and holds
+the button task in the CHECK state until the button is pressed. The INIT state
+initializes variables required at the beginning of the turret process (i.e. 
+resetting the encoder, setting the initial setpoint, turning on the builtin
+LED for user information). The WAIT state waits the required 5 seconds before 
+setting the `start_flag` and `image_flag` variables high to start the rotate 
+task and image task. Once in the DONE state, the button task does nothing,
+waiting for a user to cause a `KeyboardInterrupt` to exit the turret process.
 \n\n
 
 
