@@ -25,7 +25,7 @@
 var NAVTREE =
 [
   [ "ME 405 Term Project", "index.html", [
-    [ "title of mainpage", "index.html", null ],
+    [ "Introduction", "index.html", "index" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ME 405 Term Project: title of mainpage</title>
+<title>ME 405 Term Project: Introduction</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">ME 405 Term Project<span id="projectnumber">&#160;1.1.16</span>
+   <div id="projectname">ME 405 Term Project<span id="projectnumber">&#160;1.2.17</span>
    </div>
    <div id="projectbrief">heat-seeking nerf turret</div>
   </td>
@@ -92,28 +92,71 @@ $(function(){initNavTree('index.html',''); initResizable(); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">title of mainpage </div></div>
+  <div class="headertitle"><div class="title">Introduction </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>details</p>
-<p>here</p>
-<p>are more</p>
-<p>things too.</p>
-<p>need to add subsections and details TODO</p>
-<p>here's an image!</p>
-<div class="image">
-<img src="https://github.com/8red10/ME_405_Term_Project/blob/main/src/images/task_diagram.png" alt="" height="300"/>
-<div class="caption">
-'task_diagram' </div></div>
-<p>another attempt<br  />
-<img src="./../src/images/button_state_diagram.png" alt="button state diagram" height="500" class="inline"/></p>
-<p>link attempt</p>
-<p><img src="https://github.com/8red10/ME_405_Term_Project/blob/main/src/images/button_state_diagram.png" alt="button state diagram" height="300" class="inline"/></p>
-<p>svg attempt </p><div class="image">
-<object type="image/svg+xml" data="image_state_diagram.svg" height="300" style="pointer-events: none;"></object>
-<div class="caption">
-'image' </div></div>
-<p> d </p>
+<div class="textblock"><p>This is the software documentation for the ME 405 final project. <br  />
+<br  />
+</p>
+<h1><a class="anchor" id="sec0"></a>
+Software Overview</h1>
+<p>The software running the turret was designed to multitask using a task scheduler to efficiently run the turret. There are three tasks: button task, image task, and rotate task. The button task monitors the button and waits the appropriate 5 seconds before signaling the image task and rotate task to start. The image task gets a thermal image from the camera and parses the image data into a setpoint to send to the rotate task. The rotate task rotates the turret towards the identified target and fires the turret by actuating the servo. <br  />
+<br  />
+</p>
+<h2><a class="anchor" id="ssec0_0"></a>
+Software Organization</h2>
+<p>This project is organized such that the <code><a class="el" href="main_8py.html" title="Main file for the ME 405 Term Project.">main.py</a></code> file imports necessary driver classes. This file also creates the turret generator class that contains the individual task generator functions as methods of the turret generator class to allow for ease of use of shared variables. When run as the main file, <code><a class="el" href="main_8py.html" title="Main file for the ME 405 Term Project.">main.py</a></code> initializes the tasks and continuously runs the task scheduler until a <code>KeyboardInterrupt</code> is caught.</p>
+<p>The <code><a class="el" href="encoder__reader_8py.html" title="This file contains the Encoder class that can be used to read the position of a motor encoder and wil...">encoder_reader.py</a></code> file contains the class to interface with the encoders built into the DC motors used in this project as well as the ME 405 lab.</p>
+<p>The <code><a class="el" href="mlx__cam_8py.html" title="A stripped down MLX90640 driver that produces only raw data, not calibrated data, to use as an target...">mlx_cam.py</a></code> file contains the class to interface with the MLX90640 thermal infrared camera. This camera is used to obtain information of the target's location to derive a setpoint to aim the turret to.</p>
+<p>The <code><a class="el" href="motor__driver_8py.html" title="This file contains code for the MotorDriver class that implements a motor driver for the ME 405 kit.">motor_driver.py</a></code> file contains the class to interact with and actuate the motor through the L6206 Motor Driver Hat attached to the STM32 board. This motor is what is used to rotate the turret.</p>
+<p>The <code><a class="el" href="proportional__controller_8py.html" title="This file contains code for the ProportionalController class that is built to drive an actuator propo...">proportional_controller.py</a></code> file contains the class that can run a proportional controller with a changeable position gain and derivative gain. This class is initialized to read from the encoder and actuate the motor.</p>
+<p>The <code><a class="el" href="servo__driver_8py.html" title="This file contains code to drive a 1501 MG servo.">servo_driver.py</a></code> file contains the class to set the position of the servo that pulls the trigger of the turret.</p>
+<p>The <code><a class="el" href="test_8py.html" title="A file to help test files and aspects of the ME 405 Term Project.">test.py</a></code> file contains testing functions and classes useful for solving issues and learning more about this project. The <code><a class="el" href="main_8py.html" title="Main file for the ME 405 Term Project.">main.py</a></code> file does not <code>import</code> the <code><a class="el" href="test_8py.html" title="A file to help test files and aspects of the ME 405 Term Project.">test.py</a></code> file, this is simply included for extra information about some of our testing processes. <br  />
+<br  />
+</p>
+<h1><a class="anchor" id="sec1"></a>
+Diagrams</h1>
+<p>This section includes the task diagram and state diagrams to provide more information on the control of the turret. <br  />
+<br  />
+</p>
+<h2><a class="anchor" id="ssec1_0"></a>
+Task Diagram</h2>
+<p><img src="./../src/images/task_diagram.png" alt="task diagram" height="400" class="inline"/></p>
+<p>Figure 1. This figure illustrates the task diagram for the turret process. <br  />
+<br  />
+</p>
+<h2><a class="anchor" id="ssec1_1"></a>
+State Diagrams</h2>
+<p><b>Rotate</b> <b>Task</b> </p>
+<p><img src="./../src/images/rotate_state_diagram.png" alt="rotate state diagram" height="300" class="inline"/></p>
+<p>Figure 2. This figure illustrates the state diagram for the <b>rotate</b> <b>task</b> of the turret process. <br  />
+<br  />
+ <b>Image</b> <b>Task</b> </p>
+<p><img src="./../src/images/image_state_diagram.png" alt="image state diagram" height="300" class="inline"/></p>
+<p>Figure 3. This figure illustrates the state diagram for the <b>image</b> <b>task</b> of the turret process <br  />
+<br  />
+ <b>Button</b> <b>Task</b> </p>
+<p><img src="./../src/images/button_state_diagram.png" alt="button state diagram" height="300" class="inline"/></p>
+<p>Figure 4. This figure illustrates the state diagram for the <b>button</b> <b>task</b> of the turret process <br  />
+<br  />
+</p>
+<h1><a class="anchor" id="sec2"></a>
+Schematics</h1>
+<p>This section includes schematics of some of the custom electronic design used for this project. <br  />
+<br  />
+</p>
+<h2><a class="anchor" id="ssec2_0"></a>
+Button Schematic</h2>
+<p><img src="./../src/images/button_schematic.png" alt="button schematic" height="300" class="inline"/></p>
+<p>Figure 5. This figure illustrates the electrical schematic designed to read an active low button to start the turret process. PC2 is the signal input to the microcontroller. <br  />
+<br  />
+</p>
+<h2><a class="anchor" id="ssec2_1"></a>
+Servo Schematic</h2>
+<p><img src="./../src/images/servo_schematic.png" alt="servo schematic" height="300" class="inline"/></p>
+<p>Figure 5. This figure illustrates the electrical schematic designed to convert 12V DV to ~6V with a 7805A JRC transistor to supply the servo used to pull the trigger on the turret. PB3 is the signal output from the microcontroller to control the PWM to the servo and therefore position of the servo. <br  />
+<br  />
+</p>
 </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"/>
 </div><!-- contents -->
