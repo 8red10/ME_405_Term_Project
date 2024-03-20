@@ -56,7 +56,7 @@ information on the control of the turret.
 
 @subsection ssec1_0 Task Diagram
 
-<img src='./../src/images/task_diagram.png' alt='task diagram' height='400'>
+<img src='task_diagram.png' alt='task diagram' height='400'>
 
 Figure 1. This figure illustrates the task diagram for the turret process.
 \n\n
