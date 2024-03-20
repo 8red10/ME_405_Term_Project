@@ -76,7 +76,7 @@ class ServoDriver:
                     value is 19999 to help create an actual frequency
                     of 50Hz corresponding to an actual period of 20ms.
         @param      ps -> An integer representinig the value to set 
-                    the prescalar to. Default value is 79 to help 
+                    the prescaler to. Default value is 79 to help 
                     create an actual frequency of 50Hz corresponding
                     to an actual period of 20ms.
         @returns    None.
@@ -85,7 +85,7 @@ class ServoDriver:
         self.pin = pyb.Pin(pin,pyb.Pin.OUT_PP)
         # initialize the AR register value of the timer
         self.AR = period
-        # initialize the prescalar register value of the timer
+        # initialize the prescaler register value of the timer
         self.PS = ps 
         # calculate the actual period of the timer, in milliseconds
         self.actual_period = (self.AR + 1) * (self.PS + 1) * 1000 / F_SYSCLK
@@ -98,7 +98,7 @@ class ServoDriver:
 
     def get_whole_period(self):
         '''!
-        Returns the actual period of the timer, with the prescalar and AR 
+        Returns the actual period of the timer, with the prescaler and AR 
         values taken into account.
         @param      None.
         @returns    Acutal period of the timer in units of milliseconds.
@@ -202,3 +202,4 @@ def test_servo():
 # file is imported as a module by some other main program
 if __name__ == '__main__':
     test_servo()
+    
