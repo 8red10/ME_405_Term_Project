@@ -13,7 +13,7 @@ March 18, 2024
 
 ## Description
 For the Winter Quarter term of ME 405's lab, we were assigned by Dr. John Ridgely 
-to create a ***heat-sensing foam dart blaster turret***. Its capabilites include full 
+to create a **heat-sensing foam dart blaster turret**. Its capabilites include full 
 autonomous motion, aiming, and firing. For aiming it would use a lab provided 
 thermal infrared camera (model MLX90640) to find its intended target.
 
@@ -41,5 +41,8 @@ and
 <a href="https://github.com/spluttflob/ME405-Support/blob/main/src/cotask.py" title="cotask">cotask</a>
 with some associated documentation found 
 <a href="https://spluttflob.github.io/ME405-Support/" title="ME 405 documentatin">here</a>.
+
+
+
 
 
