@@ -68,13 +68,14 @@ associated components.
 
 <div align='center'><img src='./src/images/Shaft1.PNG' alt='main shaft' height='300'>
 
-Figure 3. When designing the Foam Dart Blaster Turret we centralized 
+Figure 1. When designing the Foam Dart Blaster Turret we centralized 
 it around its main axle of rotaion. This rotation would be from the 
 96 teeth gear. To support this design, the central shaft was 
 designed to connect to the 6 inner gaps, as seen below.
 
 
-![main frame](./src/images/MainFrame2.PNG)
+<!-- ![main frame](./src/images/MainFrame2.PNG) -->
+<div align='center'><img src='./src/images/MainFrame2.PNG' alt='main frame' height='300'>
 
 Figure 4. In order to power the 96 teeth gear, it needed to connect 
 to the chosen motor of this project: the Ametek-Pittman DC Encoder 
