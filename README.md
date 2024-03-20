@@ -152,9 +152,36 @@ at that point.
 <div align='left'>
 
 
+## Electromechanical Properties
+
+<div align='center'>
+
+| Motor Parameter | Value | Unit | 
+|:---------------:|:-----:|:----:|
+| Total Rotating Mass | 0.407 | $kg$ |
+| Length to Center of Gravity | 0.050 | $m$ |
+| Mass Moment of Inertia | 1.125e-3 | $I$ |
+| Viscous Damping Coefficient | 3.14e-7 | $b$ |
+| Torque Constant | 0.0282 | $K_t$ |
+| Back-emf Constant | 0.0282 | $K_v$ |
+| Terminal Resistance | 35.0 | $\Omega$ |
+| Terminal Inductance | 1.00e-5$*$| $H$ | 
+| Motor DC Voltage | 12 | $V$ |
+
+**Table 1.** Characteristics of the motor used in our project.
+
+<div align='left'>
+
+* Length to Center of Gravity is measured from the origin of 
+the axis of rotation to the center of gravity.
+* Assumed a near zero inductance due to the insignificance 
+of the inductance to the load on the turret motor.
+
+
 ## Electronics Design
 This section illustrates some of the key custom electronic designs used for this 
 project.
+
 
 ### Start Button
 
@@ -218,4 +245,119 @@ into a setpoint to send to the rotate task. The rotate task rotates the turret
 towards the identified target and fires the turret by actuating the servo. More
 information and software documentation can be found 
 <a href="https://8red10.github.io/ME_405_Term_Project/" title="project documentation">here</a>.
+
+
+## Discussion 
+This section includes reflection on our process and the results obtained.
+
+
+### Discussion of Results
+For testing, we chose to test each major component of our project seperately first 
+before testing the entirety of it. These seperate components were our camera, turret 
+(furthermore, the proportional controller), and servo motor. 
+
+For the camera, we would test that, based off the ascii image it produced, if it 
+would produce an accurate set point value. For the turret, we would test if it rotate 
+in time to a given set point. For the servo motor, we would test if it would rotate 
+far back enough to pull the trigger far enough for it to fire a foam dart. After each 
+component passed their respective tests, we then moved on to the Dueling Day set up 
+for its final test; accurately aiming and firing a foam dart to the target.
+
+When it came to the final test, it had one issue: it would not aim properly. Although 
+we tested the camera seperately, the set point value it produced was only 
+theoretically correct. However, when it came to testing the device as a whole, it had 
+trouble aiming. The resolution to this was editting its aiming algorithim. The way 
+it worked before was that it first found the mean heat values of each row, then the 
+mean of the mean values. This "mean squared" value was then the row it based its 
+aiming from, finding the highest heat value in it as its target. The issue with this 
+algorithim was when it would find "mean squared" value for its row selection. At times, 
+it would chose a row that did not contain the target's heat signiture. The highest heat 
+value in that row would then be non-related to the target, producing an unaccurate set 
+point value. To fix this, the algorithim was editted so that instead of finding the 
+mean of the mean values, it found the max of the mean values. This meant that by 
+choosing the row with the highest heat value average, the intended target's position 
+would be accurately captured.
+
+After fixing that issue, our device performed perfectly. Upon its first test after 
+resolving the issue, it shoot a foam dart right into Jason's face. After he recovered 
+from his injuries, we continued to test the device, becoming furthur confident in our 
+turret's capabilities. 
+
+
+### Discussion on Learnings
+Over the course of the creation of this project, there were many obstacles that arose.
+Even so, it was from these obstacles that we learned the most. Three major problems
+became apparent once assembly began. 
+
+#### Central Shaft Issue
+Firstly, the central shaft was too thick as the size of the DC motor was not taken 
+into account when modeling. Due to lack of time to print an updated design, the central 
+shaft (and connected main turret shaft portion) was sanded down in Mustang60 using a 
+vetical belt wood sander. However, due to the heat from sanding, the plastic of the 3D 
+print began to melt. So instead of simply grinding down the plastic, the melted layer 
+of plastic was pushed to the ends of the shaft (mostly towards the main turret end). 
+This provided a small benefit in fusing the central shaft to the main turret together. 
+In the end, the central shaft was able to be "sanded" down in size to allow clearance 
+for the DC motor. However, if this project were to continue it would be best to shrink 
+the shaft to a diamter of 1 and 1/5th of an inch (this is while maintaining the design 
+at the bottom of the shaft to connect it to the gear). 
+
+<div align='center'>
+
+<img src='./src/images/meltedshaft.jpg' alt='melted shaft' height='300'>
+
+**Figure 14.** This figure illustrates the melted plastic of the main shaft that was 
+the result of our use of the belt sander to allow clearance for the motor.
+
+<div align='left'>
+
+
+#### Servo Attachment Issue
+Secondly, the portion of the main turret that housed the servo motor had walls that were 
+too long. Specifically, the servo motor could not fit in due to there being no room for 
+the wires to pass through. To remedy this, the back wall was cut down in size. In future 
+it would be best to consider the entirety of the servo motor when modeling its housing. 
+
+<div align='center'>
+
+<img src='./src/images/sawedservomotorholder.jpg' alt='sawed servo holder' height='300'>
+
+**Figure 15.** This figure illustrates the resulting servo motor holder after sawing off 
+one of the walls to allow room for the wires to pass through.
+
+<div align='left'>
+
+
+#### Tolerances Issue
+Thirdly, the 3D printed base of the project had large tolerances when printed, causing 
+the more precise modeling of the base to be ruined. Specifically, the small holes modeled 
+house the nuts were too small for them. The intended purpose of these holes were to house 
+these nuts along where the screws used to hold down the top plate to the bottom frame 
+would go, allowing the screws to thread into the nuts. This would essentially have the 
+screws and nuts clamp the bottom frame and top plate together. However, this was not 
+possible as said before. Luckily, the project did not create much movement vertically 
+along itself, so while the screws we holding the top plate to the bottom frame loose, 
+they did perform their main function of preventing the top plate from rotating along 
+with the lazy susan. It would be best in future to consider the tolerance range of the 
+3D printer when modeling the more sensitive portions of the project. 
+
+
+## Completed Design
+These next images illustrate the final product in action.
+
+<div align='center'>
+
+<img src='./src/images/final_design_back.jpg' alt='final design back view' height='300'>
+
+**Figure 16.** Back view of the final design in action. 
+
+
+<img src='./src/images/final_design_front.jpg' alt='final design front view' height='300'>
+
+**Figure 17.** Front view of the final design in action. 
+
+<div align='left'>
+
+
+
 
