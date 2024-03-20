@@ -329,7 +329,7 @@ one of the walls to allow room for the wires to pass through.
 
 
 #### Tolerances Issue
-Thirdly, the 3D printed base of the project had large tolerances when printed, causing 
+Third, the 3D printed base of the project had large tolerances when printed, causing 
 the more precise modeling of the base to be ruined. Specifically, the small holes modeled 
 house the nuts were too small for them. The intended purpose of these holes were to house 
 these nuts along where the screws used to hold down the top plate to the bottom frame 
@@ -347,12 +347,12 @@ These next images illustrate the final product in action.
 
 <div align='center'>
 
-<img src='./src/images/final_design_back.jpg' alt='final design back view' height='300'>
+<img src='./src/images/final_design_back.jpg' alt='final design back view' height='400'>
 
 **Figure 16.** Back view of the final design in action. 
 
 
-<img src='./src/images/final_design_front.jpg' alt='final design front view' height='300'>
+<img src='./src/images/final_design_front.jpg' alt='final design front view' height='400'>
 
 **Figure 17.** Front view of the final design in action. 
 
