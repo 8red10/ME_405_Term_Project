@@ -61,14 +61,14 @@ Pitch Screws
 * 3x Stainless Steel Hex M4 x 0.7 mm Pitch Nuts
 
 
-### CAD Model Description:
+### **CAD Model Description:**
 This section the idea behind the design of the main body and 
 associated components.
 
 
 <div align='center'><img src='./src/images/Shaft1.PNG' alt='main shaft' height='300'>
 
-Figure 1. When designing the Foam Dart Blaster Turret we centralized 
+**Figure 1.** When designing the Foam Dart Blaster Turret we centralized 
 it around its main axle of rotaion. This rotation would be from the 
 96 teeth gear. To support this design, the central shaft was 
 designed to connect to the 6 inner gaps, as seen below.
