@@ -28,9 +28,16 @@ to Dr. John Ridgely's provided HTML file below.
 
 
 ## Dependencies
-This project depends on a couple of MicroPython files as well as a couple professor 
-created or adapted files. The MicroPython 
+This project depends on the MicroPython 
 <a href="https://docs.micropython.org/en/latest/library/pyb.html" title="pyb">pyb</a>,
 <a href="https://docs.micropython.org/en/latest/library/machine.I2C.html" title="machine I2C">machine I2C</a>,
 and 
 <a href="https://docs.micropython.org/en/v1.15/library/utime.html" title="uitme">utime</a>
+libraries as well as 
+<a href="https://github.com/spluttflob/ME405-Support/tree/main/mlx_raw" title="mlx_cam">mlx_cam</a>,
+and 
+<a href="https://github.com/spluttflob/ME405-Support/blob/main/src/cotask.py" title="cotask">cotask</a>
+with some associated documentation found 
+<a href="https://spluttflob.github.io/ME405-Support/" title="ME 405 documentatin">here</a>.
+
+
