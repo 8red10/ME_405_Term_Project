@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['proportionalcontroller_0',['ProportionalController',['../classproportional__controller_1_1_proportional_controller.html',1,'proportional_controller']]]
+  ['datanotavailableerror_0',['DataNotAvailableError',['../classmlx90640_1_1_data_not_available_error.html',1,'mlx90640']]]
 ];
