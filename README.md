@@ -84,7 +84,7 @@ number as the 96 teeth gear. To ensure constant contact between
 these two gears, the required distance between the two was kept in 
 mind when designing the bottom frame of the Foam Dart Blaster Turret. 
 
-
+<div align='left'>
 ![motor holder](./src/images/MotorHolder1.PNG)
 
 Figure 5. The bottom frame also accounted for the distance gained from 
