@@ -149,14 +149,13 @@ at that point.
 <div align='left'>
 
 
-### Electrical Schematics
+## Electronics
 This section illustrates some of the key custom electronic designs used for this 
 project.
 
-#### Start Button
+### Start Button
 
 <div align='center'>
-
 
 <img src='./src/images/button_schematic.png' alt='button schematic' height='300'>
 
@@ -172,13 +171,37 @@ a low signal to our chosen pin input. From this low signal, we are able to code 
 the micro-controller based around it. The pin we chose to take the button circuitry's 
 input was pin PC2.
 
+<div align='left'>
 
-#### Emergency Stop Circuitry
+### Emergency Stop Component
 
-For the emergency stop we used a red wire that was responsible for supplying power to the motors of our project. To connect this red wire to the power cable, we used two terminal screws that were secured to our device via zip ties. 
-(insert image of red wires connected to terminal screws)
+<div align='center'>
 
-#### Voltage Regulator Circuitry
+<img src='./src/images/emergencystop.jpg' alt='emergency stop' height='300'>
 
-In order to supply the correct amount of voltage to our servo motor (5-6 V), we used a voltage regulator to reduce our source voltage of 12 V to 5.5 V to our servo motor. By following the manuel and connecting two capacitors to its terminal ends, we were able to supply our servo motor the proper amount of voltage. 
-(insert close up image of voltage regulator set up)
+**Figure 11.** For the emergency stop we used a red wire that was responsible for 
+supplying power to the motors of our project. To connect this red wire to the power 
+cable, we used two terminal screws that were secured to our device via zip ties. 
+
+<div align='left'>
+
+### Voltage Regulator for Servo Input
+
+<div align='center'>
+
+<img src='./src/images/servo_schematic.png' alt='servo schematic' height='300'>
+
+**Figure 12.** This illustrates the schematic of the voltage regulator that converts 
+the 12V DC supply for the motor down to a managable 6V for the servo's VDD. The PB3
+tag identifies the pin output from the microcontroller to the servo signal wire.
+
+<img src='./src/images/voltageregulator.jpg' alt='voltage regulator' height='300'>
+
+**Figure 13.** In order to supply the correct amount of voltage to our servo motor 
+(5-6 V), we used a voltage regulator to reduce our source voltage of 12 V to 5.5 V to 
+our servo motor. By following the manuel and connecting two capacitors to its terminal 
+ends, we were able to supply our servo motor the proper amount of voltage. 
+
+<div align='left'>
+
+
