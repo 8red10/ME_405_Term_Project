@@ -17,7 +17,10 @@ Making a heat-sensing nerf turret. TODO
 
 ## Dependencies
 essentially want to say that needs the micropython environment and 
-to ***import pyb*** and ***import machine***
+to ***import pyb*** and 'import machine'
+'''
+code block ?
+'''
 TODO
 
 ## Hardware Design
