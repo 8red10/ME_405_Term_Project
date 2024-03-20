@@ -149,7 +149,7 @@ at that point.
 <div align='left'>
 
 
-## Electronics
+## Electronics Design
 This section illustrates some of the key custom electronic designs used for this 
 project.
 
@@ -193,7 +193,8 @@ cable, we used two terminal screws that were secured to our device via zip ties.
 
 **Figure 12.** This illustrates the schematic of the voltage regulator that converts 
 the 12V DC supply for the motor down to a managable 6V for the servo's VDD. The PB3
-tag identifies the pin output from the microcontroller to the servo signal wire.
+tag identifies the pin output from the microcontroller to the servo signal wire. A
+7805A JRC transistor was used to facilitate most of the voltage regulation.
 
 <img src='./src/images/voltageregulator.jpg' alt='voltage regulator' height='300'>
 
@@ -204,4 +205,14 @@ ends, we were able to supply our servo motor the proper amount of voltage.
 
 <div align='left'>
 
+
+## Software Design
+The software running the turret was designed to multitask using a task scheduler
+to more efficiently run the turret. The button task monitors the button and waits 
+the appropriate 5 seconds before signaling the image task and rotate task to start.
+The image task gets a thermal image from the camera and parses the image data 
+into a setpoint to send to the rotate task. The rotate task rotates the turret
+towards the identified target and fires the turret by actuating the servo. More
+information and software documentation can be found 
+<a href="https://8red10.github.io/ME_405_Term_Project/" title="project documentation">here</a>.
 
