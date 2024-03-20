@@ -2,43 +2,48 @@
 @file main.py
 @brief      Main file for the ME 405 Term Project.
 @details    Fires a Nerf dart at a detected thermal signature. Utilizes 
-            a state machine to control the overall process. Waits for a 
-            push button input to start. After button input, waits 5 seconds
-            for opponent to position themselves. Then reads an image from a
-            MLX90640 thermal camera and parses the location of the opponent.
-            Then aims the turret towards the opponent with the use of a 
-            propotional controller. Then actuates a servo to press the
-            trigger to fire the Nerf dart. 
-            
-            State Diagram:
-                Start -> IDLE state -> WAIT state -> LOCATE state -> 
-                PARSE state -> ROTATE state -> FIRE state -> RESET state
-            
-            IDLE state:     waits for the push button to start the process.
+            scheduled tasks to control the overall process. Has three tasks:
+            button task, image task, and rotate task. The button task runs 
+            every 10ms, setting the enable flags for the other tasks once 
+            the button press is detected. The image task waits for the image
+            enable flag then captures an image and parses the results to set
+            the shared setpoint variable to the location identified by the
+            parse function as the target location. The rotate tasks waits for
+            the rotate enable flag then repeatedly runs the proportional 
+            controller with the shared setpoint variable as the setpoint. 
+            Once the motor actuation value is below a set threshold, the 
+            rotate task will stop running the proportional controller and 
+            will actuate the servo to pull the trigger on the nerf gun.
+            While this code multitasks, it does not have the funcitonality 
+            to fire multiple bullets, i.e. at multiple targets. \n
 
-            WAIT state:     waits 5 seconds for opponent to position 
-                            themselves.
+            Push button connection:\n
+            Signal          = PC2\n
+            VDD             = 3V3\n
+            Ground          = GND\n
 
-            LOCATE state:   captures an image from the MLX90640 thermal 
-                            camera.
+            Servo connection:\n
+            Signal          = PB3\n
+            VDD             = look at schematic\n
+            Ground          = look at schematic\n
 
-            PARSE state:    obtains the opponent location from thermal image
-                            data.
+            Camera qwiic connection:\n
+            Black wire      = ground\n
+            Red wire        = 3V3\n
+            Blue wire       = SDA (I2C bus 1 = PB9; I2C bus 2 = PB11)\n
+            Yellow wire     = SCL (I2C bus 1 = PB8; I2C bus 2 = PB10)\n
+            The I2C bus 1 is used in for this project\n
 
-            ROTATE state:   rotates the turret to the desired location.
+            Motor and encoder connection:\n
+            Blue wire	    = PC7, Encoder channel B\n
+            Yellow wire	    = PC6, Encoder channel A\n
+            Red	wire        = 3V3, Encoder 5V supply (should be connected to the 3.3V output)\n
+            Black wire	    = GND, Encoder ground\n
+            Orange wire	    = B+ of L6206 H-bridge, Motor power\n
+            Green wire	    = B- of L6206 H-bridge, Motor power\n
 
-            FIRE state:     actuates a servo to pull the trigger on the 
-                            Nerf gun.
-            
-            RESET state:    waits here until positions of the turret are
-                            manually reset.
-
-
-            Camera qwiic connection: 
-            Black wire      = ground
-            Red wire        = 3V3
-            Blue wire       = SDA (I2C bus 1 = PB9; I2C bus 2 = PB11)
-            Yellow wire     = SCL (I2C bus 1 = PB8; I2C bus 2 = PB10)
+            Builtin LED configuration:\n
+            Output          = LD2 (builtin)\n
 
                             
 @authors    Jack Krammer and Jason Chang
@@ -55,7 +60,6 @@ import encoder_reader
 import proportional_controller
 import mlx_cam
 import servo_driver
-# from array import array
 import math
 import cotask
 import task_share
@@ -365,7 +369,7 @@ class turret_gen_class:
         '''!
         This generator function funs the state machine for the button task.
         Constantly checks the state of the active low start button. After
-        the button is pressed, initializes values for this to be the start
+        the button is pressed, initializes values for the start
         position and waits 5 seconds for opponents to position themself.
         @param      None.
         @returns    None.
@@ -553,7 +557,9 @@ class turret_gen_class:
 def main():
     '''!
     This function is only executed when this file is ran as the main file.
-    Runs the turret process as a task. 
+    Runs the turret process as a task. Initializes the tasks and runs the
+    task scheduler in a while loop until a KeyboardInterrupt is detected.
+    Prints debugging/informational messages about the current process.
     @param      None.
     @returns    None.
     '''
