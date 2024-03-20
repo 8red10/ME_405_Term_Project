@@ -15,6 +15,10 @@ March 18, 2024
 Making a heat-sensing nerf turret. TODO
 
 
+## Dependencies
+essentially want to say that needs the micropython environment and 
+to ***import pyb*** and ***import machine***
+TODO
 
 ## Hardware Design
 This section identifies key components in the hardware design 
@@ -56,7 +60,6 @@ This section the idea behind the design of the main body and
 associated components.
 
 
-<div align='center'>dd
 <img src='./src/images/Shaft1.PNG' alt='main shaft' height='300' align='center'>
 
 Figure 3. When designing the Foam Dart Blaster Turret we centralized 
