@@ -61,12 +61,13 @@ Pitch Screws
 * 3x Stainless Steel Hex M4 x 0.7 mm Pitch Nuts
 
 
-### **CAD Model Description:**
-This section the idea behind the design of the main body and 
-associated components.
+### CAD Model Description:
+This section the idea behind the design of the main body and associated 
+components.
 
+<div align='center'>
 
-<div align='center'><img src='./src/images/Shaft1.PNG' alt='main shaft' height='300'>
+<img src='./src/images/Shaft1.PNG' alt='main shaft' height='300'>
 
 **Figure 1.** When designing the Foam Dart Blaster Turret we centralized 
 it around its main axle of rotaion. This rotation would be from the 
@@ -84,7 +85,7 @@ number as the 96 teeth gear. To ensure constant contact between
 these two gears, the required distance between the two was kept in 
 mind when designing the bottom frame of the Foam Dart Blaster Turret. 
 
-<div align='left'>
+
 ![motor holder](./src/images/MotorHolder1.PNG)
 
 Figure 5. The bottom frame also accounted for the distance gained from 
@@ -170,6 +171,7 @@ motor had walls that were too long. Specifically, the servo motor could not
 fit in due to there being no room for the wires to pass through. To remedy 
 this, the back wall was cut down in size.
 
+<div align='left'>
 
 ### Electromechanical Properties
 
